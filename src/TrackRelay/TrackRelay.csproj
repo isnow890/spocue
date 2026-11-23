@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>SpoCue</AssemblyName>
     <ApplicationIcon>Assets/SpoCue.ico</ApplicationIcon>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets/SpoCue.ico" />

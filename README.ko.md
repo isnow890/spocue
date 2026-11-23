@@ -5,7 +5,7 @@
 <h1 align="center">SpoCue</h1>
 
 <p align="center">
-  <strong>어느 창에서나 바로 쓰는 Spotify 단축키, 앨범 색을 따라가는 곡 알림 토스트, F10–F12 볼륨 키</strong>
+  <strong>어느 창에서나 바로 쓰는 Spotify 단축키, Spotify 단독 볼륨 조절, 앨범 색을 따라가는 곡 알림 토스트</strong>
 </p>
 
 <p align="center">
@@ -28,16 +28,14 @@
 
 **SpoCue**는 최신 Windows 10/11과 현행 Spotify 데스크톱 앱에서 바로 쓸 수 있도록 **순수 C# / WPF**로 가볍게 만든 트레이 앱입니다. 무거운 Electron도, 번거로운 Spotify 개발자 API 키 발급이나 로그인도 필요 없습니다.
 
-- **어디서나 먹는 전역 단축키**: 작업 중인 창을 벗어나지 않고 **재생 / 일시정지**, **다음 곡**, **이전 곡**, **현재 곡 보기**, **Spotify 단독 볼륨 조절**(`Ctrl + Shift + Up/Down`), **현재 곡 정보 복사**(`Ctrl + Shift + C`)를 실행합니다. 단축키는 원하는 조합으로 바꾸거나 필요 없는 항목만 끌 수 있고, 다른 프로그램이 이미 쓰는 키와 겹치면 기존 설정을 그대로 유지해 단축키가 중간에 꼬이지 않습니다.
+- **어디서나 먹는 전역 단축키**: 작업 중인 창을 벗어나지 않고 **재생 / 일시정지**, **다음 곡**, **이전 곡**, **현재 곡 보기**, **Spotify 단독 볼륨 조절**(`Ctrl + Shift + Up/Down`), **현재 곡 정보 복사**(`Ctrl + Shift + C`)를 실행합니다. 각 단축키 왼쪽에 있는 **체크박스**로 원하는 기능만 한 번에 켜고 끌 수 있으며, 다른 프로그램이 이미 쓰는 키와 겹치면 기존 설정을 그대로 유지해 단축키가 중간에 꼬이지 않습니다.
 - **게임 소리는 그대로 두는 Spotify 단독 볼륨 조절**: Windows CoreAudio(`ISimpleAudioVolume`)로 **`Spotify.exe` 앱 볼륨만 5% 단위로** 따로 올리고 내립니다. 게임이나 디스코드, 브라우저 소리는 건드리지 않고 배경음악 크기만 줄이고 싶을 때 바로 쓸 수 있습니다.
 - **앨범 커버 색을 따라가는 2줄 토스트 알림**:
   - 재생 중인 앨범 커버에서 색을 뽑아(`ArtworkPalette`) 토스트 배경과 설정창 카드 색을 자연스럽게 맞춥니다.
   - 곡이 바뀔 때 주 모니터 우측 하단에 4초 동안 떴다 사라지며, 긴 곡 제목도 잘리지 않도록 **깔끔하게 두 줄까지** 표시합니다. 현재 타이핑 중이거나 게임 중인 창의 포커스는 빼앗지 않습니다.
   - **좌클릭으로 Spotify 열기 · 우클릭으로 곡 복사**: 토스트를 **좌클릭**하면 뒤에 숨어 있던 Spotify 창을 앞으로 불러오고, **우클릭**하면 `아티스트 - 곡 제목`을 클립보드에 바로 복사합니다.
 - **로그인도, API 키도 필요 없음**: Windows 기본 미디어 세션(SMTC)으로 Spotify 데스크톱 앱(`Spotify.exe` 및 Microsoft Store 버전)과 직접 통신합니다.
-- **맥처럼 쓰는 `F10`–`F12` 볼륨 키**: 미디어 키가 없는 키보드에서도 `F10`(음소거), `F11`(볼륨 줄이기), `F12`(볼륨 키우기)로 시스템 볼륨을 조절할 수 있습니다. 이 옵션을 켜도 `Ctrl + Shift + F10` 같은 조합 단축키는 그대로 작동합니다.
-- **윈도우 시작 시 자동 실행 & 한국어/영어 지원**: 부팅할 때 트레이에 조용히 자동 실행되도록 설정할 수 있고, 한국어와 영어를 바로 전환할 수 있습니다.
-- **내장 업데이트 확인**: 하루 한 번 GitHub Releases의 새 버전을 확인해 토스트로 알려주며(설정에서 끄기 가능), 트레이 우클릭 메뉴에서 언제든 직접 확인할 수도 있습니다.
+- **윈도우 시작 시 자동 실행 · 한국어/영어 지원 · 업데이트 확인**: 부팅할 때 트레이에 조용히 자동 실행되도록 설정할 수 있고, 하루 한 번 GitHub Releases의 새 버전을 확인해 알려줍니다(설정에서 끄거나 트레이 우클릭 메뉴에서 수동 확인 가능).
 
 <p align="center">
   <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue 토스트 알림" />
@@ -58,7 +56,6 @@
 | 단축키 충돌 시 기존 단축키 안전 유지 | ✅ | — | — |
 | 포커스를 안 뺏는 앨범 커버 색상 토스트 | ✅ | — | — |
 | 토스트 클릭 시 Spotify 창 바로 띄우기 | ✅ | ✅ | — |
-| 맥 스타일 `F10` / `F11` / `F12` 볼륨 키 | ✅ | — | — |
 | API 키 불필요, 외부 라이브러리 0, MIT 오픈소스 | ✅ | ✅ (MIT) | 비공개 |
 
 ---
@@ -91,7 +88,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 설치 프로그램(`Setup.exe`)과 포터블 `.zip`, `SHA256SUMS.txt` 패키징 (Inno Setup 6 필요):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.1.0
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.3.1
 ```
 
 ---
@@ -102,14 +99,13 @@ powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.
 
 | 기능 | 기본 단축키 | 변경 가능한 키 |
 | :--- | :--- | :--- |
-| **재생 / 일시정지** | `Ctrl + Shift + F8` | `Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, `Ctrl+Alt+Shift` + `F1`~`F12`, `A`~`Z`, `0`~`9`, `Space`, 방향키, `Home`/`End`, `PageUp`/`PageDown` 또는 `끄기` |
-| **다음 곡** | `Ctrl + Shift + F9` | 위와 같음 (또는 `끄기`) |
-| **이전 곡** | `Ctrl + Shift + F7` | 위와 같음 (또는 `끄기`) |
+| **재생 / 일시정지** | `Ctrl + Shift + F8` | 체크박스 켜기/끄기 + `Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, `Ctrl+Alt+Shift`, `Win+Shift` + `F1`~`F12`, 방향키, `A`~`Z`, `0`~`9` |
+| **다음 곡** | `Ctrl + Shift + F9` | 위와 같음 |
+| **이전 곡** | `Ctrl + Shift + F7` | 위와 같음 |
 | **현재 곡 표시** | `Ctrl + Shift + F10` | 곡 변경 자동 알림을 꺼 두었을 때도 누르면 바로 현재 곡 토스트를 4초간 띄움 |
 | **Spotify 볼륨 높이기** | `Ctrl + Shift + Up` | 다른 프로그램 소리는 그대로 두고 Spotify 앱 볼륨만 5% 높임 |
 | **Spotify 볼륨 낮추기** | `Ctrl + Shift + Down` | 다른 프로그램 소리는 그대로 두고 Spotify 앱 볼륨만 5% 낮춤 |
 | **현재 곡 정보 복사** | `Ctrl + Shift + C` | `아티스트 - 곡 제목`을 클립보드에 복사 (토스트 **우클릭** 또는 트레이 메뉴에서도 가능) |
-| **시스템 볼륨 조절** | `F10` · `F11` · `F12` | 설정에서 켰을 때 동작 (`F10` 음소거 · `F11` 볼륨 낮추기 · `F12` 볼륨 높이기). `Ctrl + Shift + F10` 같은 조합 키는 그대로 사용 가능 |
 
 ---
 
@@ -131,10 +127,8 @@ SpoCue.exe --startup
 ## 참고 사항 및 FAQ
 
 1. **개인정보 수집 없음 & 업데이트 확인 안내**: 곡 제목과 앨범 커버 썸네일은 재생 중에만 메모리에 들고 있고, 파일로는 단축키·옵션 설정(`settings.json`)만 저장합니다. *"자동으로 업데이트 확인"*이 켜져 있을 때만 하루 1회 `https://api.github.com/repos/isnow890/spocue/releases/latest`에서 최신 버전 번호를 조회하며, 설정에서 언제든 끌 수 있습니다.
-2. **Windows SmartScreen 알림**: 유료 코드 서명 인증서 없이 GitHub Actions에서 바로 빌드된 파일이라 처음 실행할 때 *"Windows의 PC 보호"* 안내가 뜰 수 있습니다. **추가 정보 → 실행**을 누르면 되며, 파일 무결성은 릴리스의 `SHA256SUMS.txt`로 확인할 수 있습니다.
-3. **Spotify 데스크톱 앱 전용**: 유튜브 같은 브라우저 영상이 음악 단축키에 반응하지 않도록 Spotify 데스크톱 앱(`Spotify.exe` 및 Store 버전)만 골라서 연결합니다. 웹 브라우저에서 띄운 Spotify 웹 플레이어는 지원하지 않습니다.
-4. **관리자 권한 창과 `F10`–`F12` 볼륨 키**: SpoCue는 일반 사용자 권한으로 돌아갑니다. 관리자 권한으로 실행된 프로그램이 맨 앞에 떠 있을 때는 Windows 보안 정책(UIPI) 때문에 `F10`–`F12` 볼륨 훅이 잠시 먹지 않을 수 있습니다.
-5. **포터블 폴더 위치 이동**: 포터블 버전에서 *Windows 시작 시 실행*을 켜면 그때 실행한 `SpoCue.exe` 경로가 등록됩니다. 나중에 폴더 위치를 옮겼다면 설정에서 자동 실행을 한 번 껐다 켜 주세요 (`Setup.exe`로 설치했다면 고정 경로라 신경 쓰지 않아도 됩니다).
+2. **Spotify 데스크톱 앱 전용**: 유튜브 같은 브라우저 영상이 음악 단축키에 반응하지 않도록 Spotify 데스크톱 앱(`Spotify.exe` 및 Store 버전)만 골라서 연결합니다. 웹 브라우저에서 띄운 Spotify 웹 플레이어는 지원하지 않습니다.
+3. **포터블 폴더 위치 이동**: 포터블 버전에서 *Windows 시작 시 실행*을 켜면 그때 실행한 `SpoCue.exe` 경로가 등록됩니다. 나중에 폴더 위치를 옮겼다면 설정에서 자동 실행을 한 번 껐다 켜 주세요 (`Setup.exe`로 설치했다면 고정 경로라 신경 쓰지 않아도 됩니다).
 
 <details>
 <summary><strong>자주 묻는 질문 (문제 해결)</strong></summary>
@@ -157,17 +151,25 @@ src/TrackRelay/
 ├── SpotifyVolume.cs          # Windows CoreAudio (ISimpleAudioVolume) 기반 Spotify 단독 볼륨 제어
 ├── SpotifyWindow.cs          # Spotify.exe 창 핸들 찾기 및 앞으로 가져오기
 ├── GlobalHotkeys.cs          # Win32 RegisterHotKey 등록 및 충돌 시 이전 설정 복구
-├── VolumeKeys.cs             # F10 / F11 / F12 볼륨 조절용 키보드 훅 (WH_KEYBOARD_LL)
 ├── ArtworkPalette.cs         # 앨범 커버 색상 추출 및 토스트 배경·강조색 계산
 ├── ArtworkBadge.xaml(.cs)    # 앨범 커버 썸네일 및 기본 파형 아이콘 컨트롤
 ├── TrackToast.xaml(.cs)      # 포커스를 빼앗지 않는 4초 곡 알림 토스트 창
-├── SettingsWindow.xaml(.cs)  # 현재 곡 미리보기 카드, 단축키 설정 및 옵션 창
+├── SettingsWindow.xaml(.cs)  # 현재 곡 미리보기 카드, 체크박스 단축키 설정 및 옵션 창
 ├── StartupRegistration.cs    # Windows 시작프로그램(HKCU Run) 등록/해제
 ├── Preferences.cs            # %LOCALAPPDATA%\SpoCue\settings.json 읽기/쓰기
 ├── Strings.cs                # 한국어 / 영어 문구 및 실시간 언어 전환
 ├── Theme.xaml                # 기본 색상 팔레트 및 버튼·카드 스타일
 └── UpdateChecker.cs          # GitHub Releases 최신 버전 확인 (일일 자동 확인 및 트레이 수동 확인)
 ```
+
+---
+
+## 코드 서명 정책 (Code Signing Policy)
+
+무료 코드 서명은 [SignPath.io](https://signpath.io/)에서 제공하며, 인증서는 [SignPath Foundation](https://signpath.org/)에서 발급합니다.
+
+- **작성자, 리뷰어 및 승인자 (Authors, Reviewers, and Approvers)**: [@isnow890](https://github.com/isnow890)
+- **개인정보 보호 정책**: 이 프로그램은 사용자 또는 설치·운영자가 명시적으로 요청하지 않는 한(선택적인 GitHub Releases 최신 버전 확인 제외) 외부 네트워크 시스템으로 어떠한 정보도 전송하지 않습니다.
 
 ---
 

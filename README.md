@@ -5,7 +5,7 @@
 <h1 align="center">SpoCue</h1>
 
 <p align="center">
-  <strong>Spotify hotkeys, album-colored track toasts, and F10–F12 volume keys for Windows.</strong>
+  <strong>Spotify hotkeys, per-app volume control, and album-colored track toasts for Windows.</strong>
 </p>
 
 <p align="center">
@@ -28,16 +28,14 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 
 **SpoCue** is a small, native **C# / WPF** tray app built for Windows 10 and 11. No Electron, no background service, and no Spotify Developer API setup.
 
-- **Global Spotify Shortcuts**: Play/pause, skip tracks, adjust **Spotify's own app volume** (`Ctrl + Shift + Up/Down`), copy the current song title (`Ctrl + Shift + C`), or pop up the current song from any window. Each shortcut can be rebound or turned off individually. If a key combination is already taken by another app, SpoCue keeps your previous shortcuts intact instead of breaking partway.
+- **Global Spotify Shortcuts**: Play/pause, skip tracks, adjust **Spotify's own app volume** (`Ctrl + Shift + Up/Down`), copy the current song title (`Ctrl + Shift + C`), or pop up the current song from any window. Each shortcut row has its own checkbox so you can toggle individual hotkeys on or off without losing your key binding.
 - **Per-App Spotify Volume Control**: Uses the Windows CoreAudio session API (`ISimpleAudioVolume`) to turn **only Spotify.exe** up or down in 5% steps while leaving your game, voice chat, or browser volume untouched.
 - **Album-Colored Track Toasts**:
   - Picks its background and accent colors directly from the current album cover (`ArtworkPalette`), and switches to system colors automatically when Windows High Contrast is on.
   - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`), wrapping longer song titles cleanly across two lines.
   - **Left-Click to Open, Right-Click to Copy**: Left-click the toast to bring the Spotify desktop window straight to the front, or **right-click the toast** to copy `Artist - Title` to your clipboard.
 - **No Account or API Key Needed**: Talks directly to the Spotify desktop app (`Spotify.exe` and the Microsoft Store build) through the Windows media session API (SMTC). You don't need to log in or create a Spotify Developer token.
-- **macOS-Style `F10`–`F12` Volume Keys**: On keyboards without dedicated media keys, you can map bare `F10` (Mute), `F11` (Volume Down), and `F12` (Volume Up) to system volume. Shortcuts like `Ctrl + Shift + F10` still work normally.
-- **Start with Windows & Korean/English UI**: Can launch quietly in the tray when you sign in, and follows your Windows language (Korean or English) with an option to pick either manually.
-- **Built-in Update Checker**: Checks GitHub Releases once a day (toggleable in Settings) or on demand from the tray menu, and opens the latest release page when clicked.
+- **Start with Windows, Korean/English UI & Update Checker**: Can launch quietly in the tray when you sign in, follows your Windows language (Korean or English), and checks GitHub Releases once a day (toggleable in Settings) or on demand from the tray menu.
 
 <p align="center">
   <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue track toast" />
@@ -58,7 +56,6 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 | Safe rollback when a shortcut conflicts | ✅ | — | — |
 | Album-colored toast that never steals focus | ✅ | — | — |
 | Click toast to bring Spotify to the front | ✅ | ✅ | — |
-| Optional `F10` / `F11` / `F12` volume keys | ✅ | — | — |
 | No API token, no external dependencies, MIT open source | ✅ | ✅ (MIT) | Proprietary |
 
 ---
@@ -91,7 +88,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 To build the installer (`Setup.exe`), portable `.zip`, and `SHA256SUMS.txt` (requires Inno Setup 6):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.1.0
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.3.1
 ```
 
 ---
@@ -102,14 +99,13 @@ The first time you run SpoCue, the Settings window opens and a waveform icon app
 
 | Action | Default Shortcut | Available Keys |
 | :--- | :--- | :--- |
-| **Play / Pause** | `Ctrl + Shift + F8` | `Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, or `Ctrl+Alt+Shift` + `F1`–`F12`, `A`–`Z`, `0`–`9`, `Space`, Arrows, `Home`/`End`, `PageUp`/`PageDown`, or `Off` |
-| **Next Track** | `Ctrl + Shift + F9` | Same modifier + key options, or `Off` |
-| **Previous Track** | `Ctrl + Shift + F7` | Same modifier + key options, or `Off` |
+| **Play / Pause** | `Ctrl + Shift + F8` | Checkbox toggle + `Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, `Ctrl+Alt+Shift`, or `Win+Shift` + `F1`–`F12`, Arrows, `A`–`Z`, `0`–`9` |
+| **Next Track** | `Ctrl + Shift + F9` | Same modifier + key options |
+| **Previous Track** | `Ctrl + Shift + F7` | Same modifier + key options |
 | **Show Current Track** | `Ctrl + Shift + F10` | Pops up the 4-second track toast on demand, even if automatic track change toasts are turned off |
 | **Spotify Volume Up** | `Ctrl + Shift + Up` | Raises only Spotify's volume by 5% (Windows CoreAudio per-app session) |
 | **Spotify Volume Down** | `Ctrl + Shift + Down` | Lowers only Spotify's volume by 5% without changing game or system volume |
 | **Copy Current Track** | `Ctrl + Shift + C` | Copies `Artist - Title` to the clipboard (also available by **right-clicking** a toast or from the tray menu) |
-| **System Volume** | `F10` · `F11` · `F12` | Optional in Settings (`F10` Mute · `F11` Down · `F12` Up). Combos like `Ctrl + Shift + F10` still work as shortcuts |
 
 ---
 
@@ -131,17 +127,15 @@ SpoCue.exe --startup
 ## Privacy & Notes
 
 1. **No Telemetry & Opt-Out Update Check**: Track titles and 144px cover thumbnails stay in memory while playing, and only your settings are saved to `%LOCALAPPDATA%\SpoCue\settings.json`. When *"Check for updates automatically"* is enabled, SpoCue sends one unauthenticated `GET` request per day to `https://api.github.com/repos/isnow890/spocue/releases/latest` to compare the version tag. You can turn this off anytime in Settings.
-2. **Windows SmartScreen**: Release files are built on GitHub Actions without a paid code-signing certificate. If Windows shows *"Windows protected your PC"* on first run, click **More info → Run anyway**. You can verify file hashes against `SHA256SUMS.txt` on the release page.
-3. **Desktop App Only**: SpoCue only listens to the Spotify desktop app (`Spotify.exe` or the Store version) so browser tabs like YouTube don't hijack your music shortcuts. The Spotify web player isn't supported.
-4. **Admin Windows & `F10`–`F12` Volume**: SpoCue runs as a normal user process. When an elevated (Run as Administrator) app is in the foreground, Windows blocks user-level keyboard hooks (`WH_KEYBOARD_LL`), so `F10`–`F12` volume keys won't fire until you focus a normal window.
-5. **Moving the Portable Folder**: *"Start with Windows"* saves the path of the `SpoCue.exe` you ran it from. If you move a portable folder later, toggle *"Start with Windows"* off and back on.
+2. **Desktop App Only**: SpoCue only listens to the Spotify desktop app (`Spotify.exe` or the Store version) so browser tabs like YouTube don't hijack your music shortcuts. The Spotify web player isn't supported.
+3. **Moving the Portable Folder**: *"Start with Windows"* saves the path of the `SpoCue.exe` you ran it from. If you move a portable folder later, toggle *"Start with Windows"* off and back on.
 
 <details>
 <summary><strong>Troubleshooting / FAQ</strong></summary>
 
 - **It says *"Waiting for Spotify"* even though Spotify is open**: Play any song once in Spotify desktop so Windows creates the media session, and make sure *"Show desktop overlay when using media keys"* is turned on in Spotify's settings.
 - **Saving a shortcut says it can't be registered**: Windows only lets one program register a global shortcut at a time. Another app (like GeForce Overlay, PowerToys, or a screen recorder) is already using that combo.
-- **No toast appears when the song changes**: Check that *"Show notification when track changes"* is enabled. The song already playing when SpoCue starts is treated as the starting point, and toasts appear from the next track change onward. Use **Preview notification** or `Ctrl + Shift + F10` to test right away.
+- **No toast appears when the song changes**: Check that *"Show notification when track changes"* is enabled. The song already playing when SpoCue starts is treated as the starting point, and toasts appear from the next track change onward. Use **Preview toast** or `Ctrl + Shift + F10` to test right away.
 - **Clicking the toast doesn't open Spotify**: If Spotify was closed or hidden to the tray without a main window, open Spotify once first.
 
 </details>
@@ -157,17 +151,25 @@ src/TrackRelay/
 ├── SpotifyVolume.cs          # Windows CoreAudio (ISimpleAudioVolume) per-app volume control for Spotify.exe
 ├── SpotifyWindow.cs          # Finds and activates the main Spotify.exe window
 ├── GlobalHotkeys.cs          # Win32 RegisterHotKey bindings with rollback on conflict
-├── VolumeKeys.cs             # Optional WH_KEYBOARD_LL hook for bare F10 / F11 / F12 volume control
 ├── ArtworkPalette.cs         # Extracts background and accent colors from the album cover
 ├── ArtworkBadge.xaml(.cs)    # Album cover thumbnail with waveform fallback
 ├── TrackToast.xaml(.cs)      # Non-focus-stealing 4-second track notification window
-├── SettingsWindow.xaml(.cs)  # Live track card, shortcut pickers & preferences UI
+├── SettingsWindow.xaml(.cs)  # Live track card, checkbox shortcut rows & preferences UI
 ├── StartupRegistration.cs    # HKCU\...\Run startup entry helper
 ├── Preferences.cs            # Reads and writes %LOCALAPPDATA%\SpoCue\settings.json
 ├── Strings.cs                # Korean & English UI strings
 ├── Theme.xaml                # Colors and control styles
 └── UpdateChecker.cs          # GitHub Releases update checker (daily opt-out + manual tray check)
 ```
+
+---
+
+## Code Signing Policy
+
+Free code signing is provided by [SignPath.io](https://signpath.io/), and the certificate is provided by the [SignPath Foundation](https://signpath.org/).
+
+- **Authors, Reviewers, and Approvers**: [@isnow890](https://github.com/isnow890) (Project Maintainer)
+- **Privacy Policy**: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it (limited to optional GitHub Releases version checks when enabled).
 
 ---
 

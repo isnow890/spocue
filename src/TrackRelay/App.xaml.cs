@@ -19,7 +19,6 @@ public partial class App : Application
     private bool _ownsInstance;
     private SpotifySession? _spotify;
     private GlobalHotkeys? _hotkeys;
-    private VolumeKeys? _volumeKeys;
     private UpdateChecker? _updater;
     private bool _startWithWindows;
     private Forms.NotifyIcon? _tray;
@@ -52,13 +51,10 @@ public partial class App : Application
         _hotkeys = new GlobalHotkeys();
         _hotkeys.Pressed += OnShortcut;
         var hotkeyNotice = _hotkeys.Apply(_preferences);
-        _volumeKeys = new VolumeKeys(Dispatcher, () =>
-            ShowToast(new Track("SpoCue", Strings.Get("VolumeError"), ""), canOpenSpotify: false));
         string? optionNotice = null;
         try
         {
             _startWithWindows = StartupRegistration.IsEnabled();
-            _volumeKeys.SetEnabled(_preferences.VolumeFunctionKeys);
         }
         catch (Exception exception) when (exception is Win32Exception or IOException or UnauthorizedAccessException or SecurityException)
         {
@@ -114,17 +110,7 @@ public partial class App : Application
         {
             var error = _hotkeys!.Apply(preferences, () =>
             {
-                var previousVolumeKeys = _volumeKeys!.Enabled;
-                _volumeKeys.SetEnabled(preferences.VolumeFunctionKeys);
-                try
-                {
-                    StartupRegistration.Save(startWithWindows, preferences.Save);
-                }
-                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or SecurityException)
-                {
-                    _volumeKeys.SetEnabled(previousVolumeKeys);
-                    throw;
-                }
+                StartupRegistration.Save(startWithWindows, preferences.Save);
             });
             if (error is null)
             {
@@ -139,10 +125,6 @@ public partial class App : Application
                 }
             }
             return error;
-        }
-        catch (Win32Exception)
-        {
-            return Strings.Get("SaveVolumeError");
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or SecurityException)
         {
@@ -414,7 +396,6 @@ public partial class App : Application
         SystemParameters.StaticPropertyChanged -= OnSystemParametersChanged;
         _spotify?.Dispose();
         _hotkeys?.Dispose();
-        _volumeKeys?.Dispose();
         _updater?.Dispose();
         if (_tray is not null)
         {

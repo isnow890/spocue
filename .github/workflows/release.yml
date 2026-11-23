@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 0.1.0)"
+        description: "Release version (e.g. 0.3.1)"
         required: true
-        default: "0.1.0"
+        default: "0.3.1"
 
 permissions:
   contents: write
@@ -43,6 +43,40 @@ jobs:
         shell: pwsh
         run: |
           ./배포/패키지-빌드.ps1 -Version $env:VERSION
+
+      - name: Upload unsigned build artifact for SignPath
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-release
+          path: |
+            artifacts/release/spocue-v${{ env.VERSION }}-win-x64-setup.exe
+            artifacts/release/spocue-v${{ env.VERSION }}-win-x64.zip
+
+      - name: Sign release artifacts with SignPath
+        if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: "spocue"
+          signing-policy-slug: "release-signing"
+          github-artifact-id: "unsigned-release"
+          wait-for-completion: true
+          output-artifact-directory: "artifacts/release"
+
+      - name: Refresh SHA256SUMS.txt
+        shell: pwsh
+        run: |
+          $releaseDir = "artifacts/release"
+          $setup = Join-Path $releaseDir "spocue-v$($env:VERSION)-win-x64-setup.exe"
+          $zip = Join-Path $releaseDir "spocue-v$($env:VERSION)-win-x64.zip"
+          $sums = Join-Path $releaseDir "SHA256SUMS.txt"
+          $lines = foreach ($file in @($setup, $zip)) {
+            $hash = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+            $leaf = Split-Path -Leaf $file
+            "$hash  $leaf"
+          }
+          [IO.File]::WriteAllLines($sums, $lines, [Text.UTF8Encoding]::new($false))
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

@@ -46,7 +46,7 @@ internal sealed record Option<T>(T Value, string Label)
 }
 
 internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAction, Shortcut?> Shortcuts,
-    bool VolumeFunctionKeys = false, AppLanguage Language = AppLanguage.System, bool CheckUpdates = true)
+    AppLanguage Language = AppLanguage.System, bool CheckUpdates = true)
 {
     public static readonly ShortcutAction[] Actions = Enum.GetValues<ShortcutAction>();
 
@@ -61,8 +61,7 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
 
     public static readonly Option<Key>[] KeyOptions =
     [
-        new(Key.None, "Off"),
-        .. Enumerable.Range((int)Key.F1, 11).Select(value => new Option<Key>((Key)value, ((Key)value).ToString())),
+        .. Enumerable.Range((int)Key.F1, 12).Select(value => new Option<Key>((Key)value, ((Key)value).ToString())),
         new(Key.Left, "Left"), new(Key.Right, "Right"), new(Key.Up, "Up"), new(Key.Down, "Down"),
         .. Enumerable.Range((int)Key.A, 26).Select(value => new Option<Key>((Key)value, ((Key)value).ToString())),
         .. Enumerable.Range(0, 10).Select(value => new Option<Key>(Key.D0 + value, value.ToString()))
@@ -74,7 +73,7 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static Preferences Default => new(true, new()
+    public static readonly Dictionary<ShortcutAction, Shortcut> DefaultBindings = new()
     {
         [ShortcutAction.TogglePlayback] = new(Modifiers.Control | Modifiers.Shift, Key.F8),
         [ShortcutAction.NextTrack] = new(Modifiers.Control | Modifiers.Shift, Key.F9),
@@ -83,7 +82,10 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
         [ShortcutAction.SpotifyVolumeUp] = new(Modifiers.Control | Modifiers.Shift, Key.Up),
         [ShortcutAction.SpotifyVolumeDown] = new(Modifiers.Control | Modifiers.Shift, Key.Down),
         [ShortcutAction.CopyTrack] = new(Modifiers.Control | Modifiers.Shift, Key.C)
-    });
+    };
+
+    public static Preferences Default => new(true,
+        Actions.ToDictionary(action => action, action => (Shortcut?)DefaultBindings[action]));
 
     public static string FilePath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SpoCue", "settings.json");
@@ -103,20 +105,21 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
                 throw new JsonException("Missing shortcuts.");
             }
 
-            var defaults = Default;
             foreach (var action in Actions)
             {
-                if (!preferences.Shortcuts.TryGetValue(action, out var shortcut) ||
-                    (shortcut is { } binding &&
-                     (binding.Key == Key.None || !KeyOptions.Any(option => option.Value == binding.Key) ||
-                      !ModifierOptions.Any(option => option.Value == binding.Modifiers))))
+                if (!preferences.Shortcuts.TryGetValue(action, out var shortcut))
                 {
-                    preferences.Shortcuts[action] = defaults.Shortcuts[action];
+                    preferences.Shortcuts[action] = DefaultBindings[action];
+                }
+                else if (shortcut is { } binding &&
+                         (!KeyOptions.Any(option => option.Value == binding.Key) ||
+                          !ModifierOptions.Any(option => option.Value == binding.Modifiers)))
+                {
+                    preferences.Shortcuts[action] = binding.Key == Key.None ? null : DefaultBindings[action];
                 }
             }
             return new(preferences.ShowTrackChanges,
                 Actions.ToDictionary(action => action, action => preferences.Shortcuts[action]),
-                preferences.VolumeFunctionKeys,
                 Enum.IsDefined(preferences.Language) ? preferences.Language : AppLanguage.System,
                 preferences.CheckUpdates);
         }

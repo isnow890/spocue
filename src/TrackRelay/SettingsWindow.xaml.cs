@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Automation.Peers;
@@ -22,7 +23,6 @@ internal sealed partial class SettingsWindow : Window
         TrackChanges.IsChecked = preferences.ShowTrackChanges;
         StartWithWindows.IsChecked = startWithWindows;
         CheckUpdatesEnabled.IsChecked = preferences.CheckUpdates;
-        VolumeKeysEnabled.IsChecked = preferences.VolumeFunctionKeys;
         Closing += (_, e) =>
         {
             if (!_app.IsExiting)
@@ -69,7 +69,7 @@ internal sealed partial class SettingsWindow : Window
     private void ApplyClick(object sender, RoutedEventArgs e)
     {
         var preferences = new Preferences(TrackChanges.IsChecked == true,
-            _rows.ToDictionary(row => row.Action, row => row.Binding), VolumeKeysEnabled.IsChecked == true,
+            _rows.ToDictionary(row => row.Action, row => row.Binding),
             (AppLanguage)(LanguageChoice.SelectedValue ?? AppLanguage.System),
             CheckUpdatesEnabled.IsChecked == true);
         var error = _app.Apply(preferences, StartWithWindows.IsChecked == true);
@@ -82,17 +82,43 @@ internal sealed partial class SettingsWindow : Window
         UIElementAutomationPeer.FromElement(label)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
     }
 
-    private sealed class ShortcutRow(ShortcutAction action, Shortcut? shortcut)
+    private sealed class ShortcutRow : INotifyPropertyChanged
     {
-        public ShortcutAction Action { get; } = action;
+        private bool _isEnabled;
+
+        public ShortcutRow(ShortcutAction action, Shortcut? shortcut)
+        {
+            Action = action;
+            var fallback = Preferences.DefaultBindings[action];
+            _isEnabled = shortcut is not null;
+            Modifiers = shortcut?.Modifiers ?? fallback.Modifiers;
+            Key = shortcut?.Key ?? fallback.Key;
+        }
+
+        public ShortcutAction Action { get; }
         public string Label => Preferences.Label(Action);
         public string ModifierLabel => Strings.Format("ShortcutModifiers", Label);
         public string KeyLabel => Strings.Format("ShortcutKey", Label);
         public IEnumerable<Option<Modifiers>> ModifierOptions => Preferences.ModifierOptions;
-        public IEnumerable<Option<Key>> KeyOptions => Preferences.KeyOptions.Select(option =>
-            option.Value == Key.None ? new Option<Key>(Key.None, Strings.Get("KeyOff")) : option);
-        public Modifiers Modifiers { get; set; } = shortcut?.Modifiers ?? Preferences.ModifierOptions[0].Value;
-        public Key Key { get; set; } = shortcut?.Key ?? Key.None;
-        public Shortcut? Binding => Key == Key.None ? null : new Shortcut(Modifiers, Key);
+        public IEnumerable<Option<Key>> KeyOptions => Preferences.KeyOptions;
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled != value)
+                {
+                    _isEnabled = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
+                }
+            }
+        }
+
+        public Modifiers Modifiers { get; set; }
+        public Key Key { get; set; }
+        public Shortcut? Binding => IsEnabled ? new Shortcut(Modifiers, Key) : null;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }
