@@ -53,8 +53,8 @@ jobs:
             artifacts/release/spocue-v${{ env.VERSION }}-win-x64.zip
 
       - name: Sign release artifacts with SignPath
-        if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
-        uses: signpath/github-action-submit-signing-request@v1
+        if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+        uses: signpath/github-action-submit-signing-request@v2.0
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
