@@ -10,6 +10,7 @@ namespace TrackRelay;
 internal sealed partial class TrackToast : Window
 {
     private Track? _track;
+    private Action? _clickAction;
     private readonly DispatcherTimer _dismiss = new() { Interval = TimeSpan.FromSeconds(4) };
     public event Action? OpenSpotifyRequested;
     public event Action? CopyTrackRequested;
@@ -34,10 +35,11 @@ internal sealed partial class TrackToast : Window
         SetWindowLong(handle, extendedStyle, GetWindowLong(handle, extendedStyle) | noActivate);
     }
 
-    public void ShowTrack(Track track, bool canOpenSpotify)
+    public void ShowTrack(Track track, bool canOpenSpotify, Action? clickAction = null)
     {
         _track = track;
-        OpenSpotifyButton.IsEnabled = canOpenSpotify;
+        _clickAction = clickAction;
+        OpenSpotifyButton.IsEnabled = canOpenSpotify || clickAction is not null;
         RefreshPalette();
         TrackTitle.Text = track.Title;
         TrackSubtitle.Text = track.Artist;
@@ -55,9 +57,18 @@ internal sealed partial class TrackToast : Window
 
     private void OpenSpotifyClick(object sender, RoutedEventArgs e)
     {
+        var customClick = _clickAction;
+        _clickAction = null;
         _dismiss.Stop();
         Hide();
-        OpenSpotifyRequested?.Invoke();
+        if (customClick is not null)
+        {
+            customClick();
+        }
+        else
+        {
+            OpenSpotifyRequested?.Invoke();
+        }
     }
 
     private void CopyTrackRightClick(object sender, MouseButtonEventArgs e)

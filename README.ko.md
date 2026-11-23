@@ -37,6 +37,7 @@
 - **로그인도, API 키도 필요 없음**: Windows 기본 미디어 세션(SMTC)으로 Spotify 데스크톱 앱(`Spotify.exe` 및 Microsoft Store 버전)과 직접 통신합니다.
 - **맥처럼 쓰는 `F10`–`F12` 볼륨 키**: 미디어 키가 없는 키보드에서도 `F10`(음소거), `F11`(볼륨 줄이기), `F12`(볼륨 키우기)로 시스템 볼륨을 조절할 수 있습니다. 이 옵션을 켜도 `Ctrl + Shift + F10` 같은 조합 단축키는 그대로 작동합니다.
 - **윈도우 시작 시 자동 실행 & 한국어/영어 지원**: 부팅할 때 트레이에 조용히 자동 실행되도록 설정할 수 있고, 한국어와 영어를 바로 전환할 수 있습니다.
+- **내장 업데이트 확인**: 하루 한 번 GitHub Releases의 새 버전을 확인해 토스트로 알려주며(설정에서 끄기 가능), 트레이 우클릭 메뉴에서 언제든 직접 확인할 수도 있습니다.
 
 <p align="center">
   <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue 토스트 알림" />
@@ -129,7 +130,7 @@ SpoCue.exe --startup
 
 ## 참고 사항 및 FAQ
 
-1. **외부 통신 없음**: SpoCue는 인터넷으로 어떤 데이터도 보내지 않습니다. 곡 제목과 앨범 커버 썸네일은 재생 중에만 메모리에 들고 있고, 파일로는 단축키·옵션 설정(`settings.json`)만 저장합니다.
+1. **개인정보 수집 없음 & 업데이트 확인 안내**: 곡 제목과 앨범 커버 썸네일은 재생 중에만 메모리에 들고 있고, 파일로는 단축키·옵션 설정(`settings.json`)만 저장합니다. *"자동으로 업데이트 확인"*이 켜져 있을 때만 하루 1회 `https://api.github.com/repos/isnow890/spocue/releases/latest`에서 최신 버전 번호를 조회하며, 설정에서 언제든 끌 수 있습니다.
 2. **Windows SmartScreen 알림**: 유료 코드 서명 인증서 없이 GitHub Actions에서 바로 빌드된 파일이라 처음 실행할 때 *"Windows의 PC 보호"* 안내가 뜰 수 있습니다. **추가 정보 → 실행**을 누르면 되며, 파일 무결성은 릴리스의 `SHA256SUMS.txt`로 확인할 수 있습니다.
 3. **Spotify 데스크톱 앱 전용**: 유튜브 같은 브라우저 영상이 음악 단축키에 반응하지 않도록 Spotify 데스크톱 앱(`Spotify.exe` 및 Store 버전)만 골라서 연결합니다. 웹 브라우저에서 띄운 Spotify 웹 플레이어는 지원하지 않습니다.
 4. **관리자 권한 창과 `F10`–`F12` 볼륨 키**: SpoCue는 일반 사용자 권한으로 돌아갑니다. 관리자 권한으로 실행된 프로그램이 맨 앞에 떠 있을 때는 Windows 보안 정책(UIPI) 때문에 `F10`–`F12` 볼륨 훅이 잠시 먹지 않을 수 있습니다.
@@ -164,7 +165,8 @@ src/TrackRelay/
 ├── StartupRegistration.cs    # Windows 시작프로그램(HKCU Run) 등록/해제
 ├── Preferences.cs            # %LOCALAPPDATA%\SpoCue\settings.json 읽기/쓰기
 ├── Strings.cs                # 한국어 / 영어 문구 및 실시간 언어 전환
-└── Theme.xaml                # 기본 색상 팔레트 및 버튼·카드 스타일
+├── Theme.xaml                # 기본 색상 팔레트 및 버튼·카드 스타일
+└── UpdateChecker.cs          # GitHub Releases 최신 버전 확인 (일일 자동 확인 및 트레이 수동 확인)
 ```
 
 ---

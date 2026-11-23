@@ -46,7 +46,7 @@ internal sealed record Option<T>(T Value, string Label)
 }
 
 internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAction, Shortcut?> Shortcuts,
-    bool VolumeFunctionKeys = false, AppLanguage Language = AppLanguage.System)
+    bool VolumeFunctionKeys = false, AppLanguage Language = AppLanguage.System, bool CheckUpdates = true)
 {
     public static readonly ShortcutAction[] Actions = Enum.GetValues<ShortcutAction>();
 
@@ -117,7 +117,8 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
             return new(preferences.ShowTrackChanges,
                 Actions.ToDictionary(action => action, action => preferences.Shortcuts[action]),
                 preferences.VolumeFunctionKeys,
-                Enum.IsDefined(preferences.Language) ? preferences.Language : AppLanguage.System);
+                Enum.IsDefined(preferences.Language) ? preferences.Language : AppLanguage.System,
+                preferences.CheckUpdates);
         }
         catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
         {

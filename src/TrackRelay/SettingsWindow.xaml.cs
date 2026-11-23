@@ -21,6 +21,7 @@ internal sealed partial class SettingsWindow : Window
         RefreshLanguage(preferences.Language);
         TrackChanges.IsChecked = preferences.ShowTrackChanges;
         StartWithWindows.IsChecked = startWithWindows;
+        CheckUpdatesEnabled.IsChecked = preferences.CheckUpdates;
         VolumeKeysEnabled.IsChecked = preferences.VolumeFunctionKeys;
         Closing += (_, e) =>
         {
@@ -69,7 +70,8 @@ internal sealed partial class SettingsWindow : Window
     {
         var preferences = new Preferences(TrackChanges.IsChecked == true,
             _rows.ToDictionary(row => row.Action, row => row.Binding), VolumeKeysEnabled.IsChecked == true,
-            (AppLanguage)(LanguageChoice.SelectedValue ?? AppLanguage.System));
+            (AppLanguage)(LanguageChoice.SelectedValue ?? AppLanguage.System),
+            CheckUpdatesEnabled.IsChecked == true);
         var error = _app.Apply(preferences, StartWithWindows.IsChecked == true);
         SetFeedback(error ?? Strings.Get("ChangesApplied"), error is not null);
     }

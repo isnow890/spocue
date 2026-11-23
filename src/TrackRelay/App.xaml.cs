@@ -20,6 +20,7 @@ public partial class App : Application
     private SpotifySession? _spotify;
     private GlobalHotkeys? _hotkeys;
     private VolumeKeys? _volumeKeys;
+    private UpdateChecker? _updater;
     private bool _startWithWindows;
     private Forms.NotifyIcon? _tray;
     private Drawing.Icon? _trayIcon;
@@ -94,6 +95,10 @@ public partial class App : Application
             }
         };
 
+        _updater = new UpdateChecker();
+        _updater.UpdateAvailable += OnUpdateAvailable;
+        _updater.SetEnabled(_preferences.CheckUpdates);
+
         _spotify.Start();
         if (e.Args.Contains("--settings", StringComparer.OrdinalIgnoreCase) ||
             (!e.Args.Contains(StartupRegistration.LaunchArgument, StringComparer.OrdinalIgnoreCase) &&
@@ -127,6 +132,7 @@ public partial class App : Application
                 _preferences = preferences;
                 _startWithWindows = startWithWindows;
                 _settingsNotice = null;
+                _updater?.SetEnabled(preferences.CheckUpdates);
                 if (languageChanged)
                 {
                     RefreshLanguage(preferences.Language);
@@ -191,7 +197,7 @@ public partial class App : Application
         }
     }
 
-    private void ShowToast(Track track, bool canOpenSpotify = true)
+    private void ShowToast(Track track, bool canOpenSpotify = true, Action? clickAction = null)
     {
         if (IsExiting)
         {
@@ -203,7 +209,61 @@ public partial class App : Application
             _toast.OpenSpotifyRequested += OpenSpotify;
             _toast.CopyTrackRequested += CopyCurrentTrack;
         }
-        _toast.ShowTrack(track, canOpenSpotify);
+        _toast.ShowTrack(track, canOpenSpotify, clickAction);
+    }
+
+    private void OnUpdateAvailable(ReleaseUpdate update)
+    {
+        RebuildTrayMenu();
+        ShowToast(new Track(
+            Strings.Format("UpdateAvailableTitle", update.Version),
+            Strings.Get("UpdateAvailableSubtitle"),
+            ""),
+            canOpenSpotify: false,
+            clickAction: () => UpdateChecker.OpenReleasePage(update.Url));
+    }
+
+    private async void CheckForUpdatesManual()
+    {
+        if (_updater is null)
+        {
+            return;
+        }
+
+        if (_updater.LatestUpdate is { } cached)
+        {
+            UpdateChecker.OpenReleasePage(cached.Url);
+            return;
+        }
+
+        var (update, failed) = await _updater.CheckNowAsync();
+        if (failed)
+        {
+            ShowToast(new Track("SpoCue", Strings.Get("UpdateCheckError"), ""), canOpenSpotify: false);
+            return;
+        }
+
+        if (update is not null)
+        {
+            OnUpdateAvailable(update);
+            return;
+        }
+
+        ShowToast(new Track(
+            Strings.Format("UpToDateTitle", UpdateChecker.CurrentVersion),
+            Strings.Get("UpToDateSubtitle"),
+            ""), canOpenSpotify: false);
+    }
+
+    private void RebuildTrayMenu()
+    {
+        if (_tray is null)
+        {
+            return;
+        }
+        var previousMenu = _tray.ContextMenuStrip;
+        _tray.ContextMenuStrip = CreateTrayMenu();
+        previousMenu?.Dispose();
     }
 
     private void OpenSpotify()
@@ -221,6 +281,10 @@ public partial class App : Application
         menu.Items.Add(Strings.Get("ActionShowTrack"), null, (_, _) => ShowCurrentTrack());
         menu.Items.Add(Strings.Get("ActionCopyTrack"), null, (_, _) => CopyCurrentTrack());
         menu.Items.Add(Strings.Get("SettingsMenu"), null, (_, _) => OpenSettings());
+        var updateLabel = _updater?.LatestUpdate is { } update
+            ? Strings.Format("UpdateAvailableMenu", update.Version)
+            : Strings.Get("CheckUpdatesMenu");
+        menu.Items.Add(updateLabel, null, (_, _) => CheckForUpdatesManual());
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(Strings.Get("ExitMenu"), null, (_, _) => ExitApplication());
         return menu;
@@ -232,9 +296,7 @@ public partial class App : Application
         _settings?.RefreshLanguage(language);
         _settings?.SetConnectionStatus(_spotify!.Status);
         _settings?.SetCurrentTrack(_spotify!.CurrentTrack);
-        var previousMenu = _tray!.ContextMenuStrip;
-        _tray.ContextMenuStrip = CreateTrayMenu();
-        previousMenu?.Dispose();
+        RebuildTrayMenu();
     }
 
     private async void OnShortcut(ShortcutAction action)
@@ -353,6 +415,7 @@ public partial class App : Application
         _spotify?.Dispose();
         _hotkeys?.Dispose();
         _volumeKeys?.Dispose();
+        _updater?.Dispose();
         if (_tray is not null)
         {
             _tray.Visible = false;

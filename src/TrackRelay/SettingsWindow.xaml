@@ -70,6 +70,8 @@
                       Foreground="{DynamicResource InkBrush}" />
             <CheckBox x:Name="StartWithWindows" Content="{DynamicResource StartWithWindows}" MinHeight="30"
                       Foreground="{DynamicResource InkBrush}" />
+            <CheckBox x:Name="CheckUpdatesEnabled" Content="{DynamicResource CheckUpdatesLabel}" MinHeight="30"
+                      Foreground="{DynamicResource InkBrush}" />
             <CheckBox x:Name="VolumeKeysEnabled" Content="{DynamicResource VolumeKeysLabel}" MinHeight="30"
                       Foreground="{DynamicResource InkBrush}" AutomationProperties.HelpText="{DynamicResource VolumeKeysHelp}" />
             <TextBlock Text="{DynamicResource VolumeKeysHelp}" Foreground="{DynamicResource MutedBrush}"

@@ -37,6 +37,7 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 - **No Account or API Key Needed**: Talks directly to the Spotify desktop app (`Spotify.exe` and the Microsoft Store build) through the Windows media session API (SMTC). You don't need to log in or create a Spotify Developer token.
 - **macOS-Style `F10`–`F12` Volume Keys**: On keyboards without dedicated media keys, you can map bare `F10` (Mute), `F11` (Volume Down), and `F12` (Volume Up) to system volume. Shortcuts like `Ctrl + Shift + F10` still work normally.
 - **Start with Windows & Korean/English UI**: Can launch quietly in the tray when you sign in, and follows your Windows language (Korean or English) with an option to pick either manually.
+- **Built-in Update Checker**: Checks GitHub Releases once a day (toggleable in Settings) or on demand from the tray menu, and opens the latest release page when clicked.
 
 <p align="center">
   <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue track toast" />
@@ -129,7 +130,7 @@ SpoCue.exe --startup
 
 ## Privacy & Notes
 
-1. **Completely Offline**: SpoCue makes zero network requests. Track titles and 144px cover thumbnails stay in memory while playing, and only your settings are saved to `%LOCALAPPDATA%\SpoCue\settings.json`.
+1. **No Telemetry & Opt-Out Update Check**: Track titles and 144px cover thumbnails stay in memory while playing, and only your settings are saved to `%LOCALAPPDATA%\SpoCue\settings.json`. When *"Check for updates automatically"* is enabled, SpoCue sends one unauthenticated `GET` request per day to `https://api.github.com/repos/isnow890/spocue/releases/latest` to compare the version tag. You can turn this off anytime in Settings.
 2. **Windows SmartScreen**: Release files are built on GitHub Actions without a paid code-signing certificate. If Windows shows *"Windows protected your PC"* on first run, click **More info → Run anyway**. You can verify file hashes against `SHA256SUMS.txt` on the release page.
 3. **Desktop App Only**: SpoCue only listens to the Spotify desktop app (`Spotify.exe` or the Store version) so browser tabs like YouTube don't hijack your music shortcuts. The Spotify web player isn't supported.
 4. **Admin Windows & `F10`–`F12` Volume**: SpoCue runs as a normal user process. When an elevated (Run as Administrator) app is in the foreground, Windows blocks user-level keyboard hooks (`WH_KEYBOARD_LL`), so `F10`–`F12` volume keys won't fire until you focus a normal window.
@@ -164,7 +165,8 @@ src/TrackRelay/
 ├── StartupRegistration.cs    # HKCU\...\Run startup entry helper
 ├── Preferences.cs            # Reads and writes %LOCALAPPDATA%\SpoCue\settings.json
 ├── Strings.cs                # Korean & English UI strings
-└── Theme.xaml                # Colors and control styles
+├── Theme.xaml                # Colors and control styles
+└── UpdateChecker.cs          # GitHub Releases update checker (daily opt-out + manual tray check)
 ```
 
 ---
