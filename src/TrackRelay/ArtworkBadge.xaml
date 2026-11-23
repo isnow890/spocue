@@ -1,0 +1,17 @@
+<UserControl x:Class="TrackRelay.ArtworkBadge" x:ClassModifier="internal" x:Name="Badge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="False" IsHitTestVisible="False">
+  <Grid>
+    <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="8">
+      <Path Data="M 2 9 L 2 15 M 7 5 L 7 19 M 12 2 L 12 22 M 17 6 L 17 18 M 22 9 L 22 15"
+            Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+            VerticalAlignment="Center" HorizontalAlignment="Center" />
+    </Border>
+    <Border CornerRadius="8">
+      <Border.Background>
+        <ImageBrush ImageSource="{Binding Artwork, ElementName=Badge}" Stretch="UniformToFill" />
+      </Border.Background>
+    </Border>
+  </Grid>
+</UserControl>

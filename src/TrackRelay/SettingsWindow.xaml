@@ -1,0 +1,109 @@
+<Window x:Class="TrackRelay.SettingsWindow" x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TrackRelay"
+        Title="{DynamicResource SettingsTitle}" Width="578" Height="738" MinWidth="432" MinHeight="340"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource CanvasBrush}"
+        FontFamily="{StaticResource BodyFont}" FontSize="14" UseLayoutRounding="True">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="26,20,26,8">
+        <TextBlock Text="SpoCue" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold"
+                   FontSize="32" AutomationProperties.HeadingLevel="Level1" />
+
+        <Border x:Name="CurrentTrackFrame" Margin="0,14,0,0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="11" Padding="14">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <local:ArtworkBadge x:Name="CurrentArtwork" Width="60" Height="60" />
+            <StackPanel Grid.Column="1" Margin="13,0,12,0" VerticalAlignment="Center">
+              <TextBlock x:Name="ConnectionStatus" FontSize="12" Foreground="{DynamicResource AccentBrush}"
+                         TextTrimming="CharacterEllipsis" AutomationProperties.LiveSetting="Polite" />
+              <TextBlock x:Name="CurrentTitle" FontSize="17" FontWeight="SemiBold" Margin="0,2,0,0"
+                         TextTrimming="CharacterEllipsis" />
+              <TextBlock x:Name="CurrentArtist" FontSize="13" Foreground="{DynamicResource MutedBrush}"
+                         TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <Button Grid.Column="2" Content="{DynamicResource PreviewToast}" Style="{StaticResource ActionButton}"
+                    VerticalAlignment="Center" Click="PreviewClick" />
+          </Grid>
+        </Border>
+
+        <TextBlock Margin="0,23,0,1" Text="{DynamicResource ShortcutsHeading}" Style="{StaticResource SectionHeading}" />
+        <TextBlock Text="{DynamicResource ShortcutsHint}" FontSize="13" Foreground="{DynamicResource MutedBrush}" />
+        <ItemsControl x:Name="ShortcutRows" Margin="0,9,0,0">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderBrush}">
+                <Grid MinHeight="45">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="146" />
+                    <ColumnDefinition Width="76" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Text="{Binding Label}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,8,0" />
+                  <ComboBox Grid.Column="1" Margin="0,5,8,5" MinHeight="33" VerticalContentAlignment="Center"
+                            ItemsSource="{Binding ModifierOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                            SelectedValue="{Binding Modifiers}" AutomationProperties.Name="{Binding ModifierLabel}" />
+                  <ComboBox Grid.Column="2" Margin="0,5" MinHeight="33" VerticalContentAlignment="Center"
+                            ItemsSource="{Binding KeyOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                            SelectedValue="{Binding Key}" AutomationProperties.Name="{Binding KeyLabel}" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderBrush}" Padding="0,17,0,0">
+          <StackPanel>
+            <TextBlock Text="{DynamicResource PreferencesHeading}" Style="{StaticResource SectionHeading}" Margin="0,0,0,7" />
+            <CheckBox x:Name="TrackChanges" Content="{DynamicResource NotifyOnChange}" MinHeight="30"
+                      Foreground="{DynamicResource InkBrush}" />
+            <CheckBox x:Name="StartWithWindows" Content="{DynamicResource StartWithWindows}" MinHeight="30"
+                      Foreground="{DynamicResource InkBrush}" />
+            <CheckBox x:Name="VolumeKeysEnabled" Content="{DynamicResource VolumeKeysLabel}" MinHeight="30"
+                      Foreground="{DynamicResource InkBrush}" AutomationProperties.HelpText="{DynamicResource VolumeKeysHelp}" />
+            <TextBlock Text="{DynamicResource VolumeKeysHelp}" Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12" TextWrapping="Wrap" Margin="22,0,0,0" />
+            <Grid Margin="0,13,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="222" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="{DynamicResource LanguageLabel}" VerticalAlignment="Center" />
+              <ComboBox Grid.Column="1" x:Name="LanguageChoice" MinHeight="32"
+                        SelectedValuePath="Value" DisplayMemberPath="Label" VerticalContentAlignment="Center"
+                        AutomationProperties.Name="{DynamicResource LanguageLabel}" />
+            </Grid>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,1,0,0" Padding="26,11">
+      <Grid MinHeight="42">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="Feedback" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,14,0"
+                   FontSize="13" AutomationProperties.LiveSetting="Polite" />
+        <Button Grid.Column="1" Style="{StaticResource PrimaryButton}"
+                AutomationProperties.Name="{DynamicResource ApplyChanges}"
+                VerticalAlignment="Center" MinWidth="124" Click="ApplyClick">
+          <TextBlock Text="{DynamicResource ApplyChanges}" Foreground="{DynamicResource AccentTextBrush}" />
+        </Button>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
