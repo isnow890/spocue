@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 0.1.0)"
+        required: true
+        default: "0.1.0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.version && format('v{0}', inputs.version) || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve release version
+        shell: pwsh
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          } else {
+            $version = $env:INPUT_VERSION.TrimStart('v')
+          }
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build installer and portable package
+        shell: pwsh
+        run: |
+          ./배포/패키지-빌드.ps1 -Version $env:VERSION
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            artifacts/release/spocue-v${{ env.VERSION }}-win-x64-setup.exe
+            artifacts/release/spocue-v${{ env.VERSION }}-win-x64.zip
+            artifacts/release/SHA256SUMS.txt
