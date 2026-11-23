@@ -13,7 +13,10 @@ internal enum ShortcutAction
     TogglePlayback,
     NextTrack,
     PreviousTrack,
-    ShowTrack
+    ShowTrack,
+    SpotifyVolumeUp,
+    SpotifyVolumeDown,
+    CopyTrack
 }
 
 [Flags]
@@ -76,7 +79,10 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
         [ShortcutAction.TogglePlayback] = new(Modifiers.Control | Modifiers.Shift, Key.F8),
         [ShortcutAction.NextTrack] = new(Modifiers.Control | Modifiers.Shift, Key.F9),
         [ShortcutAction.PreviousTrack] = new(Modifiers.Control | Modifiers.Shift, Key.F7),
-        [ShortcutAction.ShowTrack] = new(Modifiers.Control | Modifiers.Shift, Key.F10)
+        [ShortcutAction.ShowTrack] = new(Modifiers.Control | Modifiers.Shift, Key.F10),
+        [ShortcutAction.SpotifyVolumeUp] = new(Modifiers.Control | Modifiers.Shift, Key.Up),
+        [ShortcutAction.SpotifyVolumeDown] = new(Modifiers.Control | Modifiers.Shift, Key.Down),
+        [ShortcutAction.CopyTrack] = new(Modifiers.Control | Modifiers.Shift, Key.C)
     });
 
     public static string FilePath { get; } = Path.Combine(
@@ -139,6 +145,9 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
         ShortcutAction.NextTrack => Strings.Get("ActionNext"),
         ShortcutAction.PreviousTrack => Strings.Get("ActionPrevious"),
         ShortcutAction.ShowTrack => Strings.Get("ActionShowTrack"),
+        ShortcutAction.SpotifyVolumeUp => Strings.Get("ActionSpotifyVolumeUp"),
+        ShortcutAction.SpotifyVolumeDown => Strings.Get("ActionSpotifyVolumeDown"),
+        ShortcutAction.CopyTrack => Strings.Get("ActionCopyTrack"),
         _ => throw new ArgumentOutOfRangeException(nameof(action))
     };
 }

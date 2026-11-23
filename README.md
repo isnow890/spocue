@@ -28,11 +28,12 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 
 **SpoCue** is a small, native **C# / WPF** tray app built for Windows 10 and 11. No Electron, no background service, and no Spotify Developer API setup.
 
-- **Global Spotify Shortcuts**: Play/pause, skip tracks, or pop up the current song from any window. Each shortcut can be rebound or turned off individually. If a key combination is already taken by another app, SpoCue keeps your previous shortcuts intact instead of breaking partway.
+- **Global Spotify Shortcuts**: Play/pause, skip tracks, adjust **Spotify's own app volume** (`Ctrl + Shift + Up/Down`), copy the current song title (`Ctrl + Shift + C`), or pop up the current song from any window. Each shortcut can be rebound or turned off individually. If a key combination is already taken by another app, SpoCue keeps your previous shortcuts intact instead of breaking partway.
+- **Per-App Spotify Volume Control**: Uses the Windows CoreAudio session API (`ISimpleAudioVolume`) to turn **only Spotify.exe** up or down in 5% steps while leaving your game, voice chat, or browser volume untouched.
 - **Album-Colored Track Toasts**:
   - Picks its background and accent colors directly from the current album cover (`ArtworkPalette`), and switches to system colors automatically when Windows High Contrast is on.
-  - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`).
-  - **Click to Open Spotify**: Click the toast (or the track card in Settings) to bring the Spotify desktop window straight to the front.
+  - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`), wrapping longer song titles cleanly across two lines.
+  - **Left-Click to Open, Right-Click to Copy**: Left-click the toast to bring the Spotify desktop window straight to the front, or **right-click the toast** to copy `Artist - Title` to your clipboard.
 - **No Account or API Key Needed**: Talks directly to the Spotify desktop app (`Spotify.exe` and the Microsoft Store build) through the Windows media session API (SMTC). You don't need to log in or create a Spotify Developer token.
 - **macOS-Style `F10`–`F12` Volume Keys**: On keyboards without dedicated media keys, you can map bare `F10` (Mute), `F11` (Volume Down), and `F12` (Volume Up) to system volume. Shortcuts like `Ctrl + Shift + F10` still work normally.
 - **Start with Windows & Korean/English UI**: Can launch quietly in the tray when you sign in, and follows your Windows language (Korean or English) with an option to pick either manually.
@@ -51,6 +52,8 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 | :--- | :---: | :---: | :---: |
 | Works with current Spotify desktop (Win32 & Store) | ✅ | ⚠️ (Broken on newer builds) | ✅ |
 | Custom shortcuts on keyboards without media keys | ✅ | ✅ | — |
+| Per-app Spotify volume control (leaves game/system volume alone) | ✅ | ✅ | — |
+| One-key / right-click track info copy to clipboard | ✅ | ✅ | — |
 | Safe rollback when a shortcut conflicts | ✅ | — | — |
 | Album-colored toast that never steals focus | ✅ | — | — |
 | Click toast to bring Spotify to the front | ✅ | ✅ | — |
@@ -102,6 +105,9 @@ The first time you run SpoCue, the Settings window opens and a waveform icon app
 | **Next Track** | `Ctrl + Shift + F9` | Same modifier + key options, or `Off` |
 | **Previous Track** | `Ctrl + Shift + F7` | Same modifier + key options, or `Off` |
 | **Show Current Track** | `Ctrl + Shift + F10` | Pops up the 4-second track toast on demand, even if automatic track change toasts are turned off |
+| **Spotify Volume Up** | `Ctrl + Shift + Up` | Raises only Spotify's volume by 5% (Windows CoreAudio per-app session) |
+| **Spotify Volume Down** | `Ctrl + Shift + Down` | Lowers only Spotify's volume by 5% without changing game or system volume |
+| **Copy Current Track** | `Ctrl + Shift + C` | Copies `Artist - Title` to the clipboard (also available by **right-clicking** a toast or from the tray menu) |
 | **System Volume** | `F10` · `F11` · `F12` | Optional in Settings (`F10` Mute · `F11` Down · `F12` Up). Combos like `Ctrl + Shift + F10` still work as shortcuts |
 
 ---
@@ -147,6 +153,7 @@ SpoCue.exe --startup
 src/TrackRelay/
 ├── App.xaml(.cs)             # Single-instance check, tray icon, dark theme & High Contrast handling
 ├── SpotifySession.cs         # Windows SMTC session lookup, playback controls & 144px cover loader
+├── SpotifyVolume.cs          # Windows CoreAudio (ISimpleAudioVolume) per-app volume control for Spotify.exe
 ├── SpotifyWindow.cs          # Finds and activates the main Spotify.exe window
 ├── GlobalHotkeys.cs          # Win32 RegisterHotKey bindings with rollback on conflict
 ├── VolumeKeys.cs             # Optional WH_KEYBOARD_LL hook for bare F10 / F11 / F12 volume control

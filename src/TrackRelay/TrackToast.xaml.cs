@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
@@ -11,6 +12,7 @@ internal sealed partial class TrackToast : Window
     private Track? _track;
     private readonly DispatcherTimer _dismiss = new() { Interval = TimeSpan.FromSeconds(4) };
     public event Action? OpenSpotifyRequested;
+    public event Action? CopyTrackRequested;
 
     public TrackToast()
     {
@@ -56,6 +58,12 @@ internal sealed partial class TrackToast : Window
         _dismiss.Stop();
         Hide();
         OpenSpotifyRequested?.Invoke();
+    }
+
+    private void CopyTrackRightClick(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        CopyTrackRequested?.Invoke();
     }
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongW")]

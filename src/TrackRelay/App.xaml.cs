@@ -150,6 +150,47 @@ public partial class App : Application
     private void ShowCurrentTrack() => ShowToast(_spotify?.CurrentTrack ??
         new Track(Strings.Get("WaitingSpotify"), Strings.Get("PlayFirst"), ""));
 
+    private void AdjustSpotifyVolume(int direction)
+    {
+        var current = _spotify?.CurrentTrack;
+        if (!SpotifyVolume.TryAdjust(direction, out var percent))
+        {
+            ShowToast(new Track("SpoCue", Strings.Get("SpotifyVolumeUnavailable"), "",
+                current?.Artwork, current?.ArtworkColor), canOpenSpotify: current is not null);
+            return;
+        }
+
+        var volumeLabel = Strings.Format("SpotifyVolumeToast", percent);
+        var toastTrack = current is not null
+            ? current with { Artist = string.IsNullOrWhiteSpace(current.Artist) ? volumeLabel : $"{current.Artist} · {volumeLabel}" }
+            : new Track(volumeLabel, "Spotify", "");
+        ShowToast(toastTrack, canOpenSpotify: true);
+    }
+
+    private void CopyCurrentTrack()
+    {
+        var current = _spotify?.CurrentTrack;
+        if (current is null || string.IsNullOrWhiteSpace(current.Title))
+        {
+            ShowToast(new Track(Strings.Get("WaitingSpotify"), Strings.Get("PlayFirst"), ""), canOpenSpotify: false);
+            return;
+        }
+
+        var text = string.IsNullOrWhiteSpace(current.Artist)
+            ? current.Title
+            : $"{current.Artist} - {current.Title}";
+        try
+        {
+            Clipboard.SetDataObject(text, copy: true);
+            ShowToast(current with { Artist = $"{Strings.Get("TrackCopiedToast")}: {text}" }, canOpenSpotify: true);
+        }
+        catch (Exception exception) when (exception is System.Runtime.InteropServices.ExternalException or ThreadStateException)
+        {
+            ShowToast(new Track("SpoCue", Strings.Get("CopyTrackError"), "",
+                current.Artwork, current.ArtworkColor), canOpenSpotify: false);
+        }
+    }
+
     private void ShowToast(Track track, bool canOpenSpotify = true)
     {
         if (IsExiting)
@@ -160,6 +201,7 @@ public partial class App : Application
         {
             _toast = new TrackToast();
             _toast.OpenSpotifyRequested += OpenSpotify;
+            _toast.CopyTrackRequested += CopyCurrentTrack;
         }
         _toast.ShowTrack(track, canOpenSpotify);
     }
@@ -177,6 +219,7 @@ public partial class App : Application
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add(Strings.Get("OpenSpotify"), null, (_, _) => OpenSpotify());
         menu.Items.Add(Strings.Get("ActionShowTrack"), null, (_, _) => ShowCurrentTrack());
+        menu.Items.Add(Strings.Get("ActionCopyTrack"), null, (_, _) => CopyCurrentTrack());
         menu.Items.Add(Strings.Get("SettingsMenu"), null, (_, _) => OpenSettings());
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(Strings.Get("ExitMenu"), null, (_, _) => ExitApplication());
@@ -196,10 +239,20 @@ public partial class App : Application
 
     private async void OnShortcut(ShortcutAction action)
     {
-        if (action == ShortcutAction.ShowTrack)
+        switch (action)
         {
-            ShowCurrentTrack();
-            return;
+            case ShortcutAction.ShowTrack:
+                ShowCurrentTrack();
+                return;
+            case ShortcutAction.SpotifyVolumeUp:
+                AdjustSpotifyVolume(1);
+                return;
+            case ShortcutAction.SpotifyVolumeDown:
+                AdjustSpotifyVolume(-1);
+                return;
+            case ShortcutAction.CopyTrack:
+                CopyCurrentTrack();
+                return;
         }
 
         var error = await _spotify!.RunAsync(action);
