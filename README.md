@@ -5,7 +5,7 @@
 <h1 align="center">SpoCue</h1>
 
 <p align="center">
-  <strong>Lightweight native Windows tray app for Spotify global hotkeys, album-tinted track toasts &amp; F10–F12 volume keys.</strong>
+  <strong>Spotify hotkeys, album-colored track toasts, and F10–F12 volume keys for Windows.</strong>
 </p>
 
 <p align="center">
@@ -24,55 +24,57 @@
 
 ## Why SpoCue?
 
-**SpoCue** brings back the fast, unobtrusive workflow of classic **Toastify** for modern Windows 10 & 11 and current Spotify desktop builds — written as a zero-dependency, pure **C# / .NET 10 WPF** tray utility with no Electron, no background service clutter, and no Spotify Web API account setup.
+If you used **Toastify** years ago, you probably miss controlling Spotify from the keyboard without alt-tabbing out of your editor or game. Toastify stopped working on modern Spotify builds, and Windows media keys only help if your keyboard actually has them.
 
-- **Global Spotify Hotkeys Across All Apps**: Control **Play / Pause**, **Next Track**, **Previous Track**, and **Show Current Track** from any window. Bindings use Win32 `RegisterHotKey` with `MOD_NOREPEAT` and **atomic two-phase apply** — so swapping keys between two actions in one save or hitting a hotkey conflict never leaves your active shortcuts half-registered.
-- **Album-Art Adaptive Track Toast**:
-  - Samples the current cover image (`ArtworkPalette`) to derive contrast-checked surface, border, and accent colors in real time, falling back cleanly to Windows System Colors when **High Contrast** mode is active.
-  - Appears on the primary display for 4 seconds (`WS_EX_NOACTIVATE`) when the track changes, never stealing focus from your editor or game.
-  - **One-Click Spotify Activation**: Click anywhere on the toast notification or the live track card in Settings to restore and foreground the Spotify desktop window (`SpotifyWindow`).
-- **Zero Account / Direct Windows SMTC Bridge**: Connects directly to the desktop Spotify process (`Spotify.exe` and Microsoft Store `SpotifyAB.SpotifyMusic_*`) via `GlobalSystemMediaTransportControlsSessionManager`. No OAuth tokens, no Spotify Developer Client ID, and zero outbound network calls.
-- **macOS-Style `F10`–`F12` System Volume Keys**: Optional low-level keyboard hook (`WH_KEYBOARD_LL`) that maps bare `F10` (Mute), `F11` (Volume Down), and `F12` (Volume Up) to system audio while letting modifier chords like `Ctrl + Shift + F10` pass through untouched.
-- **Start with Windows & Bilingual UI**: Optional per-user startup registration (`HKCU\...\Run` with `--startup`) and automatic **Korean / English** localization with instant live switching.
+**SpoCue** is a small, native **C# / WPF** tray app built for Windows 10 and 11. No Electron, no background service, and no Spotify Developer API setup.
+
+- **Global Spotify Shortcuts**: Play/pause, skip tracks, or pop up the current song from any window. Each shortcut can be rebound or turned off individually. If a key combination is already taken by another app, SpoCue keeps your previous shortcuts intact instead of breaking partway.
+- **Album-Colored Track Toasts**:
+  - Picks its background and accent colors directly from the current album cover (`ArtworkPalette`), and switches to system colors automatically when Windows High Contrast is on.
+  - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`).
+  - **Click to Open Spotify**: Click the toast (or the track card in Settings) to bring the Spotify desktop window straight to the front.
+- **No Account or API Key Needed**: Talks directly to the Spotify desktop app (`Spotify.exe` and the Microsoft Store build) through the Windows media session API (SMTC). You don't need to log in or create a Spotify Developer token.
+- **macOS-Style `F10`–`F12` Volume Keys**: On keyboards without dedicated media keys, you can map bare `F10` (Mute), `F11` (Volume Down), and `F12` (Volume Up) to system volume. Shortcuts like `Ctrl + Shift + F10` still work normally.
+- **Start with Windows & Korean/English UI**: Can launch quietly in the tray when you sign in, and follows your Windows language (Korean or English) with an option to pick either manually.
 
 <p align="center">
-  <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue Album-Tinted Track Toast" />
+  <img src="문서/이미지/토스트-알림.png" width="320" alt="SpoCue track toast" />
 </p>
 
 <p align="center">
-  <img src="문서/이미지/설정-화면.png" width="460" alt="SpoCue Settings Window" />
+  <img src="문서/이미지/설정-화면.png" width="460" alt="SpoCue settings window" />
 </p>
 
-### Quick Comparison
+### At a Glance
 
-| Capability | SpoCue | Classic Toastify | Windows Game Bar / Media Overlay |
+| Feature | SpoCue | Classic Toastify | Windows Media Overlay |
 | :--- | :---: | :---: | :---: |
-| Modern Spotify desktop support (Win32 & Store via SMTC) | ✅ | ⚠️ (Broken on newer builds) | ✅ |
-| Custom global hotkeys on keyboards without media keys | ✅ | ✅ | — |
-| Atomic hotkey swap & conflict rollback on save | ✅ | — | — |
-| Album-art adaptive color toast without stealing focus | ✅ | — | — |
-| Click toast to restore & foreground Spotify window | ✅ | ✅ | — |
-| Optional macOS-style `F10` / `F11` / `F12` volume keys | ✅ | — | — |
-| Zero Web API token, zero third-party NuGet deps, MIT open source | ✅ | ✅ (MIT) | Proprietary |
+| Works with current Spotify desktop (Win32 & Store) | ✅ | ⚠️ (Broken on newer builds) | ✅ |
+| Custom shortcuts on keyboards without media keys | ✅ | ✅ | — |
+| Safe rollback when a shortcut conflicts | ✅ | — | — |
+| Album-colored toast that never steals focus | ✅ | — | — |
+| Click toast to bring Spotify to the front | ✅ | ✅ | — |
+| Optional `F10` / `F11` / `F12` volume keys | ✅ | — | — |
+| No API token, no external dependencies, MIT open source | ✅ | ✅ (MIT) | Proprietary |
 
 ---
 
 ## Installation
 
-### Option 1: Windows Installer (`Setup.exe` — Recommended)
+### Option 1: Installer (`Setup.exe` — Recommended)
 
 1. Download `spocue-vX.Y.Z-win-x64-setup.exe` from [Releases](https://github.com/isnow890/spocue/releases/latest).
-2. Run the installer. It installs SpoCue per-user into `%LOCALAPPDATA%\Programs\SpoCue` (no UAC administrator prompt required), creates Start Menu / optional Desktop shortcuts, and registers an uninstaller in Windows *Installed Apps*.
-3. Launch **SpoCue** from the final installer step or Start Menu.
+2. Run the installer. It installs to `%LOCALAPPDATA%\Programs\SpoCue` without asking for admin rights, adds a Start Menu shortcut, and registers an uninstaller in Windows *Installed Apps*.
+3. Launch **SpoCue** at the end of setup or from the Start Menu.
 
-### Option 2: Portable Archive (`.zip`)
+### Option 2: Portable ZIP (`.zip`)
 
 1. Download `spocue-vX.Y.Z-win-x64.zip` from [Releases](https://github.com/isnow890/spocue/releases/latest).
-2. Extract the entire folder to a permanent location and run `SpoCue.exe`. Both the installer and portable ZIP bundle the .NET 10 runtime (self-contained).
+2. Extract the folder wherever you want to keep it and run `SpoCue.exe`. The .NET 10 runtime is bundled in both the installer and the ZIP.
 
 ### Option 3: Build from Source
 
-Requires Windows 10 version 2004+ (build 19041) or Windows 11, and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+Requires Windows 10 (2004+) or Windows 11, and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
 ```powershell
 git clone https://github.com/isnow890/spocue.git
@@ -82,7 +84,7 @@ dotnet build TrackRelay.slnx -c Release
 dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 ```
 
-Package a self-contained Windows installer (`Setup.exe`), portable `.zip`, and `SHA256SUMS.txt` (requires Inno Setup 6):
+To build the installer (`Setup.exe`), portable `.zip`, and `SHA256SUMS.txt` (requires Inno Setup 6):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.1.0
@@ -92,77 +94,74 @@ powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.
 
 ## First Launch & Shortcuts
 
-On your first launch, **SpoCue** opens the Settings window automatically and places its waveform icon in the Windows system tray (check the taskbar's hidden icons overflow if you don't see it immediately). Closing the Settings window keeps SpoCue running quietly in the tray; double-click the tray icon or right-click and choose **Settings** anytime to reopen it.
+The first time you run SpoCue, the Settings window opens and a waveform icon appears in the system tray (check the hidden tray overflow `^` if it isn't visible). Closing the Settings window leaves SpoCue running in the tray — double-click the tray icon or right-click and choose **Settings** whenever you want it back.
 
-| Action | Default Shortcut | Customization |
+| Action | Default Shortcut | Available Keys |
 | :--- | :--- | :--- |
-| **Play / Pause** | `Ctrl + Shift + F8` | Any modifier (`Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, `Ctrl+Alt+Shift`) + `F1`–`F12`, `A`–`Z`, `0`–`9`, `Space`, Arrows, `Home`/`End`, `PageUp`/`PageDown`, or `Off` |
-| **Next Track** | `Ctrl + Shift + F9` | Same modifier + key choices, or `Off` |
-| **Previous Track** | `Ctrl + Shift + F7` | Same modifier + key choices, or `Off` |
-| **Show Current Track** | `Ctrl + Shift + F10` | Displays the 4-second album-art toast on demand even if automatic track notifications are turned off |
-| **System Volume Keys** | `F10` · `F11` · `F12` | Optional toggle in Settings (`F10` Mute · `F11` Volume Down · `F12` Volume Up). Chords like `Ctrl + Shift + F10` continue to work normally |
+| **Play / Pause** | `Ctrl + Shift + F8` | `Ctrl+Alt`, `Ctrl+Shift`, `Alt+Shift`, or `Ctrl+Alt+Shift` + `F1`–`F12`, `A`–`Z`, `0`–`9`, `Space`, Arrows, `Home`/`End`, `PageUp`/`PageDown`, or `Off` |
+| **Next Track** | `Ctrl + Shift + F9` | Same modifier + key options, or `Off` |
+| **Previous Track** | `Ctrl + Shift + F7` | Same modifier + key options, or `Off` |
+| **Show Current Track** | `Ctrl + Shift + F10` | Pops up the 4-second track toast on demand, even if automatic track change toasts are turned off |
+| **System Volume** | `F10` · `F11` · `F12` | Optional in Settings (`F10` Mute · `F11` Down · `F12` Up). Combos like `Ctrl + Shift + F10` still work as shortcuts |
 
 ---
 
-## CLI Flags & Local Paths
-
-You can launch `SpoCue.exe` with optional command-line arguments:
+## Command-Line Options & Paths
 
 ```powershell
-# Force-open the Settings window on launch (or exit cleanly if an instance is already running)
+# Open the Settings window on launch
 SpoCue.exe --settings
 
-# Start silently in the system tray (used automatically by the "Start with Windows" registry entry)
+# Start quietly in the tray (used by "Start with Windows")
 SpoCue.exe --startup
 ```
 
 - **Settings File**: `%LOCALAPPDATA%\SpoCue\settings.json`
-- **Startup Registry Key**: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (`SpoCue`)
-- **Single-Instance Mutex**: `Local\TrackRelay`
+- **Startup Registry Entry**: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (`SpoCue`)
 
 ---
 
-## Privacy, Signing & Honest Notes
+## Privacy & Notes
 
-1. **100% Offline & Zero Telemetry**: SpoCue has no network code, no analytics, and no auto-updater background requests. Track titles, artist names, and decoded 144px cover thumbnails are held strictly in process memory while playing; only your shortcut and option preferences are written to `%LOCALAPPDATA%\SpoCue\settings.json`.
-2. **Unsigned Binary (Windows SmartScreen)**: Release binaries are built directly on GitHub Actions (`windows-latest`) without a paid EV code-signing certificate. On first run, Windows SmartScreen may show *"Windows protected your PC"*; click **More info → Run anyway**, and verify the file against `SHA256SUMS.txt` on the release page.
-3. **Spotify Desktop App Required (Not Web Player)**: SpoCue specifically filters Windows SMTC sessions for the native Spotify desktop app (`Spotify.exe` or Microsoft Store Spotify) so browser tabs like YouTube won't hijack your music hotkeys. Browser-based Spotify Web Player sessions are outside scope.
-4. **Elevated (Administrator) Foreground Windows**: Because SpoCue runs with standard user privileges (`PrivilegesRequired=lowest`), Windows UIPI (User Interface Privilege Isolation) may prevent the optional `WH_KEYBOARD_LL` `F10`–`F12` volume hook from intercepting keystrokes while an Administrator-elevated window is focused. Standard `RegisterHotKey` Spotify shortcuts (`Ctrl + Shift + F7`–`F10`) continue to work across normal desktop windows.
-5. **Startup Path Binding**: Enabling *"Start with Windows"* registers the exact path of the currently running `SpoCue.exe`. If you use the portable ZIP and later move the folder, toggle *"Start with Windows"* off and back on (or use the `Setup.exe` installer, which keeps a fixed path in `%LOCALAPPDATA%\Programs\SpoCue`).
+1. **Completely Offline**: SpoCue makes zero network requests. Track titles and 144px cover thumbnails stay in memory while playing, and only your settings are saved to `%LOCALAPPDATA%\SpoCue\settings.json`.
+2. **Windows SmartScreen**: Release files are built on GitHub Actions without a paid code-signing certificate. If Windows shows *"Windows protected your PC"* on first run, click **More info → Run anyway**. You can verify file hashes against `SHA256SUMS.txt` on the release page.
+3. **Desktop App Only**: SpoCue only listens to the Spotify desktop app (`Spotify.exe` or the Store version) so browser tabs like YouTube don't hijack your music shortcuts. The Spotify web player isn't supported.
+4. **Admin Windows & `F10`–`F12` Volume**: SpoCue runs as a normal user process. When an elevated (Run as Administrator) app is in the foreground, Windows blocks user-level keyboard hooks (`WH_KEYBOARD_LL`), so `F10`–`F12` volume keys won't fire until you focus a normal window.
+5. **Moving the Portable Folder**: *"Start with Windows"* saves the path of the `SpoCue.exe` you ran it from. If you move a portable folder later, toggle *"Start with Windows"* off and back on.
 
 <details>
 <summary><strong>Troubleshooting / FAQ</strong></summary>
 
-- **Status says *"Waiting for Spotify"* even though Spotify is open**: Start playing any track once in Spotify desktop so Windows initializes Spotify's SMTC media session, and verify that *"Show desktop overlay when using media keys"* is enabled in Spotify's desktop preferences.
-- **Applying a shortcut shows *"could not be registered"***: Windows `RegisterHotKey` is exclusive across the desktop session. Another running app (such as GeForce Experience, PowerToys, or a global capture tool) has already claimed that chord — pick a different modifier/key combination or close the conflicting utility.
-- **Toast notification doesn't appear when tracks change**: Ensure *"Show notification when track changes"* is checked in Settings. Note that the very first track detected on launch establishes the baseline silently; subsequent track changes trigger the 4-second toast. You can test the toast anytime via **Preview notification** or `Ctrl + Shift + F10`.
-- **Clicking the toast doesn't bring Spotify to the front**: If Spotify was minimized to the system tray or closed, open the main Spotify window once. SpoCue enumerates visible top-level windows belonging to `Spotify.exe` and restores them via `ShowWindow` / `SetForegroundWindow`.
+- **It says *"Waiting for Spotify"* even though Spotify is open**: Play any song once in Spotify desktop so Windows creates the media session, and make sure *"Show desktop overlay when using media keys"* is turned on in Spotify's settings.
+- **Saving a shortcut says it can't be registered**: Windows only lets one program register a global shortcut at a time. Another app (like GeForce Overlay, PowerToys, or a screen recorder) is already using that combo.
+- **No toast appears when the song changes**: Check that *"Show notification when track changes"* is enabled. The song already playing when SpoCue starts is treated as the starting point, and toasts appear from the next track change onward. Use **Preview notification** or `Ctrl + Shift + F10` to test right away.
+- **Clicking the toast doesn't open Spotify**: If Spotify was closed or hidden to the tray without a main window, open Spotify once first.
 
 </details>
 
 ---
 
-## Architecture
+## Project Layout
 
 ```text
 src/TrackRelay/
-├── App.xaml(.cs)             # Single-instance mutex, tray NotifyIcon, Fluent dark theme & High-Contrast sync
-├── SpotifySession.cs         # Windows SMTC session discovery, playback commands & 144px cover stream decoder
-├── SpotifyWindow.cs          # Win32 top-level window enumeration & foreground activation for Spotify.exe
-├── GlobalHotkeys.cs          # Win32 RegisterHotKey manager with two-phase atomic apply & conflict rollback
-├── VolumeKeys.cs             # Optional WH_KEYBOARD_LL hook & SendInput bridge for bare F10 / F11 / F12 volume keys
-├── ArtworkPalette.cs         # Stride-sampled cover color extraction & contrast-checked surface/accent tinting
-├── ArtworkBadge.xaml(.cs)    # Reusable cover thumbnail / waveform fallback badge control
-├── TrackToast.xaml(.cs)      # Non-activating (WS_EX_NOACTIVATE) 4-second track notification toast on primary screen
-├── SettingsWindow.xaml(.cs)  # Live track preview card, shortcut combo grid & preferences editor
-├── StartupRegistration.cs    # Per-user HKCU\...\Run registry integration with atomic rollback on save failure
-├── Preferences.cs            # Zero-dependency JSON reader/writer for %LOCALAPPDATA%\SpoCue\settings.json
-├── Strings.cs                # Built-in Korean & English resource dictionary with instant live UI refresh
-└── Theme.xaml                # Canonical dark blue-gray & amber palette + button/card style definitions
+├── App.xaml(.cs)             # Single-instance check, tray icon, dark theme & High Contrast handling
+├── SpotifySession.cs         # Windows SMTC session lookup, playback controls & 144px cover loader
+├── SpotifyWindow.cs          # Finds and activates the main Spotify.exe window
+├── GlobalHotkeys.cs          # Win32 RegisterHotKey bindings with rollback on conflict
+├── VolumeKeys.cs             # Optional WH_KEYBOARD_LL hook for bare F10 / F11 / F12 volume control
+├── ArtworkPalette.cs         # Extracts background and accent colors from the album cover
+├── ArtworkBadge.xaml(.cs)    # Album cover thumbnail with waveform fallback
+├── TrackToast.xaml(.cs)      # Non-focus-stealing 4-second track notification window
+├── SettingsWindow.xaml(.cs)  # Live track card, shortcut pickers & preferences UI
+├── StartupRegistration.cs    # HKCU\...\Run startup entry helper
+├── Preferences.cs            # Reads and writes %LOCALAPPDATA%\SpoCue\settings.json
+├── Strings.cs                # Korean & English UI strings
+└── Theme.xaml                # Colors and control styles
 ```
 
 ---
 
 ## License
 
-Released under the [MIT License](LICENSE). Inspired by the classic [Toastify](https://github.com/nachmore/toastify) utility; SpoCue is an independent clean-room project.
+[MIT License](LICENSE). Inspired by [Toastify](https://github.com/nachmore/toastify).
