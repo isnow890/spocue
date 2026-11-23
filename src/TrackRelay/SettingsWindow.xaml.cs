@@ -12,10 +12,12 @@ internal sealed partial class SettingsWindow : Window
 {
     private readonly App _app;
     private readonly ShortcutRow[] _rows;
+    private ToastCorner _selectedCorner;
 
     public SettingsWindow(App app, Preferences preferences, bool startWithWindows)
     {
         _app = app;
+        _selectedCorner = preferences.ToastCorner;
         InitializeComponent();
         _rows = Preferences.Actions.Select(action =>
             new ShortcutRow(action, preferences.Shortcuts[action])).ToArray();
@@ -45,8 +47,21 @@ internal sealed partial class SettingsWindow : Window
 
     public void RefreshLanguage(AppLanguage language)
     {
+        if (ToastCornerChoice.SelectedValue is ToastCorner currentCorner)
+        {
+            _selectedCorner = currentCorner;
+        }
+
         ShortcutRows.ItemsSource = null;
         ShortcutRows.ItemsSource = _rows;
+        ToastCornerChoice.ItemsSource = new Option<ToastCorner>[]
+        {
+            new(ToastCorner.BottomRight, Strings.Get("CornerBottomRight")),
+            new(ToastCorner.TopRight, Strings.Get("CornerTopRight")),
+            new(ToastCorner.BottomLeft, Strings.Get("CornerBottomLeft")),
+            new(ToastCorner.TopLeft, Strings.Get("CornerTopLeft"))
+        };
+        ToastCornerChoice.SelectedValue = _selectedCorner;
         LanguageChoice.ItemsSource = new Option<AppLanguage>[]
         {
             new(AppLanguage.System, Strings.Get("LanguageSystem")),
@@ -68,10 +83,13 @@ internal sealed partial class SettingsWindow : Window
 
     private void ApplyClick(object sender, RoutedEventArgs e)
     {
+        var corner = (ToastCorner)(ToastCornerChoice.SelectedValue ?? ToastCorner.BottomRight);
+        _selectedCorner = corner;
         var preferences = new Preferences(TrackChanges.IsChecked == true,
             _rows.ToDictionary(row => row.Action, row => row.Binding),
             (AppLanguage)(LanguageChoice.SelectedValue ?? AppLanguage.System),
-            CheckUpdatesEnabled.IsChecked == true);
+            CheckUpdatesEnabled.IsChecked == true,
+            corner);
         var error = _app.Apply(preferences, StartWithWindows.IsChecked == true);
         SetFeedback(error ?? Strings.Get("ChangesApplied"), error is not null);
     }

@@ -35,7 +35,8 @@ internal sealed partial class TrackToast : Window
         SetWindowLong(handle, extendedStyle, GetWindowLong(handle, extendedStyle) | noActivate);
     }
 
-    public void ShowTrack(Track track, bool canOpenSpotify, Action? clickAction = null)
+    public void ShowTrack(Track track, bool canOpenSpotify, Action? clickAction = null,
+        ToastCorner corner = ToastCorner.BottomRight)
     {
         _track = track;
         _clickAction = clickAction;
@@ -46,8 +47,12 @@ internal sealed partial class TrackToast : Window
         Cover.Artwork = track.Artwork;
         var workArea = SystemParameters.WorkArea;
         Width = Math.Min(360, workArea.Width - 24);
-        Left = workArea.Right - Width - 16;
-        Top = workArea.Bottom - Height - 16;
+        Left = corner is ToastCorner.BottomLeft or ToastCorner.TopLeft
+            ? workArea.Left + 16
+            : workArea.Right - Width - 16;
+        Top = corner is ToastCorner.TopLeft or ToastCorner.TopRight
+            ? workArea.Top + 16
+            : workArea.Bottom - Height - 16;
         _dismiss.Stop();
         Show();
         _dismiss.Start();

@@ -191,7 +191,7 @@ public partial class App : Application
             _toast.OpenSpotifyRequested += OpenSpotify;
             _toast.CopyTrackRequested += CopyCurrentTrack;
         }
-        _toast.ShowTrack(track, canOpenSpotify, clickAction);
+        _toast.ShowTrack(track, canOpenSpotify, clickAction, _preferences.ToastCorner);
     }
 
     private void OnUpdateAvailable(ReleaseUpdate update)

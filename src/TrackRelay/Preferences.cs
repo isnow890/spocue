@@ -45,8 +45,17 @@ internal sealed record Option<T>(T Value, string Label)
     public override string ToString() => Label;
 }
 
+internal enum ToastCorner
+{
+    BottomRight,
+    TopRight,
+    BottomLeft,
+    TopLeft
+}
+
 internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAction, Shortcut?> Shortcuts,
-    AppLanguage Language = AppLanguage.System, bool CheckUpdates = true)
+    AppLanguage Language = AppLanguage.System, bool CheckUpdates = true,
+    ToastCorner ToastCorner = ToastCorner.BottomRight)
 {
     public static readonly ShortcutAction[] Actions = Enum.GetValues<ShortcutAction>();
 
@@ -121,7 +130,8 @@ internal sealed record Preferences(bool ShowTrackChanges, Dictionary<ShortcutAct
             return new(preferences.ShowTrackChanges,
                 Actions.ToDictionary(action => action, action => preferences.Shortcuts[action]),
                 Enum.IsDefined(preferences.Language) ? preferences.Language : AppLanguage.System,
-                preferences.CheckUpdates);
+                preferences.CheckUpdates,
+                Enum.IsDefined(preferences.ToastCorner) ? preferences.ToastCorner : ToastCorner.BottomRight);
         }
         catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
         {

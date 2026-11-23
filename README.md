@@ -32,7 +32,7 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 - **Per-App Spotify Volume Control**: Uses the Windows CoreAudio session API (`ISimpleAudioVolume`) to turn **only Spotify.exe** up or down in 5% steps while leaving your game, voice chat, or browser volume untouched.
 - **Album-Colored Track Toasts**:
   - Picks its background and accent colors directly from the current album cover (`ArtworkPalette`), and switches to system colors automatically when Windows High Contrast is on.
-  - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`), wrapping longer song titles cleanly across two lines.
+  - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`), wrapping longer song titles cleanly across two lines, and lets you choose any screen corner (**Bottom Right**, **Top Right**, **Bottom Left**, or **Top Left**).
   - **Left-Click to Open, Right-Click to Copy**: Left-click the toast to bring the Spotify desktop window straight to the front, or **right-click the toast** to copy `Artist - Title` to your clipboard.
 - **No Account or API Key Needed**: Talks directly to the Spotify desktop app (`Spotify.exe` and the Microsoft Store build) through the Windows media session API (SMTC). You don't need to log in or create a Spotify Developer token.
 - **Start with Windows, Korean/English UI & Update Checker**: Can launch quietly in the tray when you sign in, follows your Windows language (Korean or English), and checks GitHub Releases once a day (toggleable in Settings) or on demand from the tray menu.
