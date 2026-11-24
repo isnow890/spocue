@@ -12,7 +12,7 @@ SpoCue is a Windows tray tool for Spotify listeners working in another app. The 
 
 The source of truth is `src/TrackRelay/Theme.xaml`. Canvas and Surface use dark blue-gray, with amber for the primary action, connection status and artwork fallback. Ink and Muted set the reading order. Error is reserved for text that explains a recoverable failure. `App.xaml.cs` maps these roles to Windows system brushes in high contrast. WPF Fluent styles supply the native combo boxes and window chrome.
 
-Bahnschrift gives the product heading and toast titles a defined silhouette. Segoe UI handles body text, controls and Windows font fallback.
+Toast titles use Segoe UI Variable Display (Segoe UI on Windows 10) so track names read like native Windows UI. Segoe UI handles body text, controls and Windows font fallback, including Korean.
 
 ## Layout and behavior
 

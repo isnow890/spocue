@@ -10,7 +10,7 @@
   <SolidColorBrush x:Key="AccentSoftBrush" Color="#3D2B21" />
   <SolidColorBrush x:Key="ErrorBrush" Color="#FFADAA" />
   <FontFamily x:Key="BodyFont">Segoe UI</FontFamily>
-  <FontFamily x:Key="DisplayFont">Bahnschrift, Segoe UI</FontFamily>
+  <FontFamily x:Key="DisplayFont">Segoe UI Variable Display, Segoe UI</FontFamily>
 
   <Style TargetType="TextBlock">
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />

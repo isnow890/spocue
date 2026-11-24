@@ -42,7 +42,7 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 </p>
 
 <p align="center">
-  <img src="문서/이미지/설정-화면.png" width="460" alt="SpoCue settings window" />
+  <img src="문서/이미지/설정-화면-en.png" width="460" alt="SpoCue settings window" />
 </p>
 
 ### At a Glance

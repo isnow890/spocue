@@ -42,10 +42,10 @@
         </Grid.ColumnDefinitions>
         <local:ArtworkBadge x:Name="Cover" Width="62" Height="62" />
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0">
-          <TextBlock x:Name="TrackTitle" FontFamily="{StaticResource DisplayFont}" FontSize="15.5"
-                     FontWeight="SemiBold" LineHeight="20" LineStackingStrategy="BlockLineHeight"
-                     MaxHeight="40" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
-          <TextBlock x:Name="TrackSubtitle" Foreground="{DynamicResource MutedBrush}" FontSize="12.5"
+          <TextBlock x:Name="TrackTitle" FontFamily="{StaticResource DisplayFont}" FontSize="14"
+                     FontWeight="SemiBold" LineHeight="18" LineStackingStrategy="BlockLineHeight"
+                     MaxHeight="36" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+          <TextBlock x:Name="TrackSubtitle" Foreground="{DynamicResource MutedBrush}" FontSize="12"
                      Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
           <Grid x:Name="VolumeMeter" Height="4" Margin="0,8,0,0" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
