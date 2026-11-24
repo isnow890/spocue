@@ -102,6 +102,19 @@ public partial class App : Application
         {
             OpenSettings();
         }
+        else
+        {
+            // A tray-only launch (e.g. Windows sign-in) is otherwise invisible: confirm it is running,
+            // and surface any startup problem (such as a shortcut conflict) instead of failing silently.
+            ShowStartupToast();
+        }
+    }
+
+    private void ShowStartupToast()
+    {
+        var titleKey = string.IsNullOrWhiteSpace(_settingsNotice) ? "StartupTitle" : "StartupNoticeTitle";
+        ShowToast(new Track(Strings.Get(titleKey), Strings.Get("StartupSubtitle"), ""),
+            canOpenSpotify: false, clickAction: OpenSettings);
     }
 
     internal string? Apply(Preferences preferences, bool startWithWindows)
@@ -141,18 +154,27 @@ public partial class App : Application
     private void AdjustSpotifyVolume(int direction)
     {
         var current = _spotify?.CurrentTrack;
-        if (!SpotifyVolume.TryAdjust(direction, out var percent))
+        // While Spotify is playing, only a session that is actually producing sound here counts.
+        // When paused, idle sessions may still be adjusted so the level is ready for the next play.
+        var result = SpotifyVolume.TryAdjust(direction, allowIdleSessions: _spotify?.IsPlaying != true, out var percent);
+        if (result == VolumeResult.PlayingElsewhere)
         {
-            ShowToast(new Track("SpoCue", Strings.Get("SpotifyVolumeUnavailable"), "",
+            ShowToast(new Track(Strings.Get("SpotifyVolumeElsewhereTitle"), Strings.Get("SpotifyVolumeElsewhereHint"), "",
+                current?.Artwork, current?.ArtworkColor), canOpenSpotify: current is not null);
+            return;
+        }
+        if (result != VolumeResult.Adjusted)
+        {
+            ShowToast(new Track(Strings.Get("SpotifyVolumeUnavailable"), "SpoCue", "",
                 current?.Artwork, current?.ArtworkColor), canOpenSpotify: current is not null);
             return;
         }
 
         var volumeLabel = Strings.Format("SpotifyVolumeToast", percent);
         var toastTrack = current is not null
-            ? current with { Artist = string.IsNullOrWhiteSpace(current.Artist) ? volumeLabel : $"{current.Artist} · {volumeLabel}" }
-            : new Track(volumeLabel, "Spotify", "");
-        ShowToast(toastTrack, canOpenSpotify: true);
+            ? current with { Artist = volumeLabel }
+            : new Track("Spotify", volumeLabel, "");
+        ShowToast(toastTrack, canOpenSpotify: true, volumePercent: percent);
     }
 
     private void CopyCurrentTrack()
@@ -179,7 +201,7 @@ public partial class App : Application
         }
     }
 
-    private void ShowToast(Track track, bool canOpenSpotify = true, Action? clickAction = null)
+    private void ShowToast(Track track, bool canOpenSpotify = true, Action? clickAction = null, int? volumePercent = null)
     {
         if (IsExiting)
         {
@@ -191,7 +213,7 @@ public partial class App : Application
             _toast.OpenSpotifyRequested += OpenSpotify;
             _toast.CopyTrackRequested += CopyCurrentTrack;
         }
-        _toast.ShowTrack(track, canOpenSpotify, clickAction, _preferences.ToastCorner);
+        _toast.ShowTrack(track, canOpenSpotify, clickAction, _preferences.ToastCorner, volumePercent);
     }
 
     private void OnUpdateAvailable(ReleaseUpdate update)

@@ -69,6 +69,7 @@ internal sealed partial class SettingsWindow : Window
             new(AppLanguage.English, "English")
         };
         LanguageChoice.SelectedValue = language;
+        AboutLine.Text = Strings.Format("AboutLine", UpdateChecker.CurrentVersion);
     }
 
     public void SetConnectionStatus(string text) => SetLiveText(ConnectionStatus, text);

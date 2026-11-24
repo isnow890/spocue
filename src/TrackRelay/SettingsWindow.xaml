@@ -97,6 +97,8 @@
             </Grid>
           </StackPanel>
         </Border>
+        <TextBlock x:Name="AboutLine" Margin="0,22,0,4" FontSize="12" TextWrapping="Wrap"
+                   Foreground="{DynamicResource MutedBrush}" />
       </StackPanel>
     </ScrollViewer>
 

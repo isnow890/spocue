@@ -1,52 +1,156 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace TrackRelay;
 
+internal enum VolumeResult
+{
+    Adjusted,
+    /// <summary>No Spotify audio session on this PC (nothing played yet, or Spotify closed).</summary>
+    Unavailable,
+    /// <summary>Spotify is playing, but not through this PC's audio (e.g. Spotify Connect to a phone).</summary>
+    PlayingElsewhere
+}
+
 internal static class SpotifyVolume
 {
     private const float Step = 0.05f;
+    private const int RenderFlow = 0;              // eRender
+    private const int DeviceStateActive = 0x1;     // DEVICE_STATE_ACTIVE
+    private const int ClsctxAll = 23;              // CLSCTX_ALL
+    private const int AudioSessionStateActive = 1; // AudioSessionStateActive
     private static readonly Guid DeviceEnumeratorClsid = new("BCDE0395-E52F-467C-8E3D-C4579291692E");
     private static readonly Guid AudioSessionManager2Iid = new("77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F");
 
-    public static bool TryAdjust(int direction, out int percent)
+    /// <param name="allowIdleSessions">
+    /// When false, only sessions that are producing sound on this PC are adjusted. Pass false while Spotify reports
+    /// playback: an idle local session then means the audio is on another device (Spotify Connect), so changing it
+    /// would be silent and the toast would claim a change nobody can hear.
+    /// </param>
+    public static VolumeResult TryAdjust(int direction, bool allowIdleSessions, out int percent)
     {
         percent = 0;
         var enumeratorType = Type.GetTypeFromCLSID(DeviceEnumeratorClsid);
         if (enumeratorType is null)
         {
-            return false;
+            return VolumeResult.Unavailable;
         }
 
         IMMDeviceEnumerator? enumerator = null;
-        IMMDevice? device = null;
-        object? managerObject = null;
-        IAudioSessionEnumerator? sessionEnumerator = null;
+        IMMDeviceCollection? devices = null;
+        var sessions = new List<SpotifyAudioSession>();
 
         try
         {
             enumerator = (IMMDeviceEnumerator)Activator.CreateInstance(enumeratorType)!;
-            // eRender = 0, eMultimedia = 1
-            if (enumerator.GetDefaultAudioEndpoint(0, 1, out device) != 0 || device is null)
+            // Spotify can be routed to any output (Windows per-app routing or Spotify's own device picker),
+            // so look through every active render endpoint instead of only the default one.
+            if (enumerator.EnumAudioEndpoints(RenderFlow, DeviceStateActive, out devices) != 0 || devices is null ||
+                devices.GetCount(out var deviceCount) != 0)
             {
-                return false;
+                return VolumeResult.Unavailable;
             }
 
+            for (uint index = 0; index < deviceCount; index++)
+            {
+                if (devices.Item(index, out var device) != 0 || device is null)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    CollectSpotifySessions(device, sessions);
+                }
+                catch (Exception exception) when (exception is COMException or InvalidCastException or UnauthorizedAccessException)
+                {
+                    // One misbehaving endpoint (e.g. a disconnecting Bluetooth headset) must not block the others.
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(device);
+                }
+            }
+
+            if (sessions.Count == 0)
+            {
+                return VolumeResult.Unavailable;
+            }
+
+            // Prefer sessions that are producing sound: switching outputs can leave an idle Spotify session behind.
+            var targets = sessions.Where(session => session.IsActive).ToList();
+            if (targets.Count == 0)
+            {
+                if (!allowIdleSessions)
+                {
+                    return VolumeResult.PlayingElsewhere;
+                }
+                targets = sessions;
+            }
+            if (targets[0].Volume.GetMasterVolume(out var current) != 0)
+            {
+                return VolumeResult.Unavailable;
+            }
+
+            var target = Math.Clamp((float)Math.Round((current + (direction * Step)) * 20f) / 20f, 0f, 1f);
+            var adjusted = false;
+            foreach (var session in targets)
+            {
+                if (target > 0f && session.Volume.GetMute(out var muted) == 0 && muted)
+                {
+                    session.Volume.SetMute(false, Guid.Empty);
+                }
+
+                if (session.Volume.SetMasterVolume(target, Guid.Empty) == 0)
+                {
+                    adjusted = true;
+                }
+            }
+
+            if (!adjusted)
+            {
+                return VolumeResult.Unavailable;
+            }
+            percent = (int)Math.Round(target * 100f);
+            return VolumeResult.Adjusted;
+        }
+        catch (Exception exception) when (exception is COMException or InvalidCastException or UnauthorizedAccessException)
+        {
+            return VolumeResult.Unavailable;
+        }
+        finally
+        {
+            foreach (var session in sessions)
+            {
+                Marshal.ReleaseComObject(session.Control);
+            }
+            if (devices is not null) Marshal.ReleaseComObject(devices);
+            if (enumerator is not null) Marshal.ReleaseComObject(enumerator);
+        }
+    }
+
+    private static void CollectSpotifySessions(IMMDevice device, List<SpotifyAudioSession> sessions)
+    {
+        object? managerObject = null;
+        IAudioSessionEnumerator? sessionEnumerator = null;
+        try
+        {
             var iid = AudioSessionManager2Iid;
-            if (device.Activate(ref iid, 23, IntPtr.Zero, out managerObject) != 0 ||
+            if (device.Activate(ref iid, ClsctxAll, IntPtr.Zero, out managerObject) != 0 ||
                 managerObject is not IAudioSessionManager2 manager)
             {
-                return false;
+                return;
             }
 
             if (manager.GetSessionEnumerator(out sessionEnumerator) != 0 || sessionEnumerator is null ||
                 sessionEnumerator.GetCount(out var count) != 0)
             {
-                return false;
+                return;
             }
 
-            var adjusted = false;
             for (var index = 0; index < count; index++)
             {
                 if (sessionEnumerator.GetSession(index, out var control) != 0 || control is null)
@@ -54,52 +158,35 @@ internal static class SpotifyVolume
                     continue;
                 }
 
+                var keep = false;
                 try
                 {
-                    if (control is not IAudioSessionControl2 control2 ||
-                        control is not ISimpleAudioVolume simpleVolume ||
-                        !IsSpotifySession(control2))
+                    if (control is IAudioSessionControl2 control2 &&
+                        control is ISimpleAudioVolume simpleVolume &&
+                        IsSpotifySession(control2))
                     {
-                        continue;
-                    }
-
-                    if (simpleVolume.GetMasterVolume(out var current) != 0)
-                    {
-                        continue;
-                    }
-
-                    var target = Math.Clamp((float)Math.Round((current + (direction * Step)) * 20f) / 20f, 0f, 1f);
-                    if (target > 0f && simpleVolume.GetMute(out var muted) == 0 && muted)
-                    {
-                        simpleVolume.SetMute(false, Guid.Empty);
-                    }
-
-                    if (simpleVolume.SetMasterVolume(target, Guid.Empty) == 0)
-                    {
-                        percent = (int)Math.Round(target * 100f);
-                        adjusted = true;
+                        var isActive = control2.GetState(out var state) == 0 && state == AudioSessionStateActive;
+                        sessions.Add(new SpotifyAudioSession(control, simpleVolume, isActive));
+                        keep = true;
                     }
                 }
                 finally
                 {
-                    Marshal.ReleaseComObject(control);
+                    if (!keep)
+                    {
+                        Marshal.ReleaseComObject(control);
+                    }
                 }
             }
-
-            return adjusted;
-        }
-        catch (Exception exception) when (exception is COMException or InvalidCastException or UnauthorizedAccessException)
-        {
-            return false;
         }
         finally
         {
             if (sessionEnumerator is not null) Marshal.ReleaseComObject(sessionEnumerator);
             if (managerObject is not null) Marshal.ReleaseComObject(managerObject);
-            if (device is not null) Marshal.ReleaseComObject(device);
-            if (enumerator is not null) Marshal.ReleaseComObject(enumerator);
         }
     }
+
+    private sealed record SpotifyAudioSession(object Control, ISimpleAudioVolume Volume, bool IsActive);
 
     private static bool IsSpotifySession(IAudioSessionControl2 control)
     {
@@ -133,10 +220,22 @@ internal static class SpotifyVolume
     private interface IMMDeviceEnumerator
     {
         [PreserveSig]
-        int EnumAudioEndpoints(int dataFlow, int stateMask, out IntPtr devices);
+        int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDeviceCollection? devices);
 
         [PreserveSig]
         int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice? endpoint);
+    }
+
+    [ComImport]
+    [Guid("0BD7A1BE-7A1A-44DB-8397-CC5392387B5E")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IMMDeviceCollection
+    {
+        [PreserveSig]
+        int GetCount(out uint count);
+
+        [PreserveSig]
+        int Item(uint index, out IMMDevice? device);
     }
 
     [ComImport]

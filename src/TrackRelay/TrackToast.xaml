@@ -47,6 +47,14 @@
                      MaxHeight="40" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
           <TextBlock x:Name="TrackSubtitle" Foreground="{DynamicResource MutedBrush}" FontSize="12.5"
                      Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+          <Grid x:Name="VolumeMeter" Height="4" Margin="0,8,0,0" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition x:Name="VolumeFilled" Width="0*" />
+              <ColumnDefinition x:Name="VolumeRemaining" Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.ColumnSpan="2" CornerRadius="2" Background="{DynamicResource BorderBrush}" />
+            <Border CornerRadius="2" Background="{DynamicResource AccentBrush}" />
+          </Grid>
         </StackPanel>
       </Grid>
     </Border>

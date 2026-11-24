@@ -28,8 +28,8 @@
 
 **SpoCue**는 최신 Windows 10/11과 현행 Spotify 데스크톱 앱에서 바로 쓸 수 있도록 **순수 C# / WPF**로 가볍게 만든 트레이 앱입니다. 무거운 Electron도, 번거로운 Spotify 개발자 API 키 발급이나 로그인도 필요 없습니다.
 
-- **어디서나 먹는 전역 단축키**: 작업 중인 창을 벗어나지 않고 **재생 / 일시정지**, **다음 곡**, **이전 곡**, **현재 곡 보기**, **Spotify 단독 볼륨 조절**(`Ctrl + Shift + Up/Down`), **현재 곡 정보 복사**(`Ctrl + Shift + C`)를 실행합니다. 각 단축키 왼쪽에 있는 **체크박스**로 원하는 기능만 한 번에 켜고 끌 수 있으며, 다른 프로그램이 이미 쓰는 키와 겹치면 기존 설정을 그대로 유지해 단축키가 중간에 꼬이지 않습니다.
-- **게임 소리는 그대로 두는 Spotify 단독 볼륨 조절**: Windows CoreAudio(`ISimpleAudioVolume`)로 **`Spotify.exe` 앱 볼륨만 5% 단위로** 따로 올리고 내립니다. 게임이나 디스코드, 브라우저 소리는 건드리지 않고 배경음악 크기만 줄이고 싶을 때 바로 쓸 수 있습니다.
+- **어디서나 먹는 전역 단축키**: 작업 중인 창을 벗어나지 않고 **재생 / 일시정지**, **다음 곡**, **이전 곡**, **현재 곡 보기**, **Spotify 단독 볼륨 조절**(`Ctrl + Shift + Up/Down`), **현재 곡 정보 복사**(`Ctrl + Shift + C`)를 실행합니다. 단축키 줄마다 있는 **체크박스**로 원하는 기능만 한 번에 켜고 끌 수 있으며, 다른 프로그램이 이미 쓰는 키와 겹치면 기존 설정을 그대로 유지해 단축키가 중간에 꼬이지 않습니다.
+- **게임 소리는 그대로 두는 Spotify 단독 볼륨 조절**: Windows CoreAudio(`ISimpleAudioVolume`)로 **`Spotify.exe` 앱 볼륨만 5% 단위로** 따로 올리고 내립니다. 게임이나 디스코드, 브라우저 소리는 건드리지 않고 배경음악 크기만 줄이고 싶을 때 바로 쓸 수 있습니다. 스피커, 헤드셋, Windows 앱별 출력 설정 등 Spotify가 어느 출력 장치로 나가든 찾아서 조절하고, 토스트에 볼륨 막대가 함께 표시됩니다.
 - **앨범 커버 색을 따라가는 2줄 토스트 알림**:
   - 재생 중인 앨범 커버에서 색을 뽑아(`ArtworkPalette`) 토스트 배경과 설정창 카드 색을 자연스럽게 맞춥니다.
   - 곡이 바뀔 때 선택한 화면 모서리(**우측 하단 / 우측 상단 / 좌측 하단 / 좌측 상단**)에 4초 동안 떴다 사라지며, 긴 곡 제목도 잘리지 않도록 **깔끔하게 두 줄까지** 표시합니다. 현재 타이핑 중이거나 게임 중인 창의 포커스는 빼앗지 않습니다.
@@ -88,7 +88,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 설치 프로그램(`Setup.exe`)과 포터블 `.zip`, `SHA256SUMS.txt` 패키징 (Inno Setup 6 필요):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.3.1
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.0
 ```
 
 ---
@@ -176,3 +176,7 @@ src/TrackRelay/
 ## 라이선스
 
 [MIT License](LICENSE). 옛 [Toastify](https://github.com/nachmore/toastify)에서 아이디어를 얻어 새로 만든 프로젝트입니다.
+
+## 상표 고지
+
+SpoCue는 개인이 만든 독립 프로젝트로, Spotify AB와 제휴하거나 보증·후원을 받지 않았습니다. Spotify는 Spotify AB의 상표이며, 이 문서에서는 SpoCue가 어떤 앱과 함께 동작하는지 설명하는 용도로만 사용합니다.

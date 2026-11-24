@@ -137,6 +137,26 @@ internal sealed class SpotifySession : IDisposable
         }
     }
 
+    /// <summary>
+    /// True when Spotify reports playback, including Spotify Connect playback on another device,
+    /// which the desktop app mirrors into Windows media controls.
+    /// </summary>
+    public bool IsPlaying
+    {
+        get
+        {
+            try
+            {
+                return FindSession()?.GetPlaybackInfo()?.PlaybackStatus ==
+                       GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+            }
+            catch (Exception exception) when (exception is COMException or UnauthorizedAccessException or InvalidOperationException)
+            {
+                return false;
+            }
+        }
+    }
+
     private GlobalSystemMediaTransportControlsSession? FindSession()
     {
         if (_manager is null)

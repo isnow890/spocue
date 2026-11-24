@@ -29,7 +29,7 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 **SpoCue** is a small, native **C# / WPF** tray app built for Windows 10 and 11. No Electron, no background service, and no Spotify Developer API setup.
 
 - **Global Spotify Shortcuts**: Play/pause, skip tracks, adjust **Spotify's own app volume** (`Ctrl + Shift + Up/Down`), copy the current song title (`Ctrl + Shift + C`), or pop up the current song from any window. Each shortcut row has its own checkbox so you can toggle individual hotkeys on or off without losing your key binding.
-- **Per-App Spotify Volume Control**: Uses the Windows CoreAudio session API (`ISimpleAudioVolume`) to turn **only Spotify.exe** up or down in 5% steps while leaving your game, voice chat, or browser volume untouched.
+- **Per-App Spotify Volume Control**: Uses the Windows CoreAudio session API (`ISimpleAudioVolume`) to turn **only Spotify.exe** up or down in 5% steps while leaving your game, voice chat, or browser volume untouched. It finds Spotify on whichever output it plays through (speakers, headset, or a per-app output set in Windows), and the toast shows a volume bar.
 - **Album-Colored Track Toasts**:
   - Picks its background and accent colors directly from the current album cover (`ArtworkPalette`), and switches to system colors automatically when Windows High Contrast is on.
   - Shows up for 4 seconds on track change without stealing window or keyboard focus (`WS_EX_NOACTIVATE`), wrapping longer song titles cleanly across two lines, and lets you choose any screen corner (**Bottom Right**, **Top Right**, **Bottom Left**, or **Top Left**).
@@ -88,7 +88,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 To build the installer (`Setup.exe`), portable `.zip`, and `SHA256SUMS.txt` (requires Inno Setup 6):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.3.1
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.0
 ```
 
 ---
@@ -176,3 +176,7 @@ Free code signing is provided by [SignPath.io](https://signpath.io/), and the ce
 ## License
 
 [MIT License](LICENSE). Inspired by [Toastify](https://github.com/nachmore/toastify).
+
+## Trademark notice
+
+SpoCue is an independent project. It is not affiliated with, endorsed by, or sponsored by Spotify AB. Spotify is a trademark of Spotify AB and is used here only to describe which app SpoCue works with.
