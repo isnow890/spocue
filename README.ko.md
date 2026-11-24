@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/isnow890/spocue/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/isnow890/spocue/build.yml?label=build&style=flat-square" alt="CI Build" /></a>
+  <a href="https://apps.microsoft.com/detail/9N85N2516FLS"><img src="https://img.shields.io/badge/Microsoft%20Store-SpoCue%20%EB%B0%9B%EA%B8%B0-0078D4?style=flat-square&logo=microsoft&logoColor=white" alt="Microsoft Store에서 받기" /></a>
   <a href="https://github.com/isnow890/spocue/releases/latest"><img src="https://img.shields.io/github/v/release/isnow890/spocue?style=flat-square" alt="Latest Release" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20(x64)-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Windows 10 / 11" />
   <img src="https://img.shields.io/badge/.NET-10%20WPF-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 10 WPF" />
@@ -62,18 +63,22 @@
 
 ## 설치 방법
 
-### 방법 1: 설치 프로그램 (`Setup.exe` — 권장)
+### 방법 1: Microsoft Store (권장)
+
+[Microsoft Store](https://apps.microsoft.com/detail/9N85N2516FLS)에서 SpoCue를 설치합니다. Store가 패키지에 서명하고 업데이트도 알아서 설치해 줍니다.
+
+### 방법 2: 설치 프로그램 (`Setup.exe`)
 
 1. [Releases](https://github.com/isnow890/spocue/releases/latest)에서 `spocue-vX.Y.Z-win-x64-setup.exe`를 받습니다.
 2. 실행하면 관리자 권한 창 없이 `%LOCALAPPDATA%\Programs\SpoCue`에 설치되고, 시작 메뉴 바로가기와 Windows '설치된 앱' 제거 항목이 등록됩니다.
 3. 설치 마지막 화면에서 바로 실행하거나 시작 메뉴에서 **SpoCue**를 엽니다.
 
-### 방법 2: 무설치 포터블 (`.zip`)
+### 방법 3: 무설치 포터블 (`.zip`)
 
 1. [Releases](https://github.com/isnow890/spocue/releases/latest)에서 `spocue-vX.Y.Z-win-x64.zip`을 받습니다.
 2. 원하는 폴더에 압축을 풀고 `SpoCue.exe`를 실행합니다. 설치본과 포터블 모두 .NET 10 런타임이 들어 있어 따로 설치할 것이 없습니다.
 
-### 방법 3: 소스 코드로 직접 빌드
+### 방법 4: 소스 코드로 직접 빌드
 
 Windows 10 (2004 이상) 또는 Windows 11, 그리고 [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)가 필요합니다.
 
@@ -88,7 +93,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 설치 프로그램(`Setup.exe`)과 포터블 `.zip`, `SHA256SUMS.txt` 패키징 (Inno Setup 6 필요):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.0
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.1
 ```
 
 ---

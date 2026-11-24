@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/isnow890/spocue/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/isnow890/spocue/build.yml?label=build&style=flat-square" alt="CI Build" /></a>
+  <a href="https://apps.microsoft.com/detail/9N85N2516FLS"><img src="https://img.shields.io/badge/Microsoft%20Store-Get%20SpoCue-0078D4?style=flat-square&logo=microsoft&logoColor=white" alt="Get it from Microsoft Store" /></a>
   <a href="https://github.com/isnow890/spocue/releases/latest"><img src="https://img.shields.io/github/v/release/isnow890/spocue?style=flat-square" alt="Latest Release" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20(x64)-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Windows 10 / 11" />
   <img src="https://img.shields.io/badge/.NET-10%20WPF-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 10 WPF" />
@@ -62,18 +63,22 @@ If you used **Toastify** years ago, you probably miss controlling Spotify from t
 
 ## Installation
 
-### Option 1: Installer (`Setup.exe` — Recommended)
+### Option 1: Microsoft Store (Recommended)
+
+Install SpoCue from the [Microsoft Store](https://apps.microsoft.com/detail/9N85N2516FLS). The Store signs the package and keeps SpoCue up to date for you.
+
+### Option 2: Installer (`Setup.exe`)
 
 1. Download `spocue-vX.Y.Z-win-x64-setup.exe` from [Releases](https://github.com/isnow890/spocue/releases/latest).
 2. Run the installer. It installs to `%LOCALAPPDATA%\Programs\SpoCue` without asking for admin rights, adds a Start Menu shortcut, and registers an uninstaller in Windows *Installed Apps*.
 3. Launch **SpoCue** at the end of setup or from the Start Menu.
 
-### Option 2: Portable ZIP (`.zip`)
+### Option 3: Portable ZIP (`.zip`)
 
 1. Download `spocue-vX.Y.Z-win-x64.zip` from [Releases](https://github.com/isnow890/spocue/releases/latest).
 2. Extract the folder wherever you want to keep it and run `SpoCue.exe`. The .NET 10 runtime is bundled in both the installer and the ZIP.
 
-### Option 3: Build from Source
+### Option 4: Build from Source
 
 Requires Windows 10 (2004+) or Windows 11, and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
@@ -88,7 +93,7 @@ dotnet run --project src/TrackRelay/TrackRelay.csproj -- --settings
 To build the installer (`Setup.exe`), portable `.zip`, and `SHA256SUMS.txt` (requires Inno Setup 6):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.0
+powershell -ExecutionPolicy Bypass -File 배포/패키지-빌드.ps1 -Version 0.5.1
 ```
 
 ---

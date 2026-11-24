@@ -8,7 +8,8 @@
             Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
             VerticalAlignment="Center" HorizontalAlignment="Center" />
     </Border>
-    <Border CornerRadius="8">
+    <!-- Square on purpose: rounding the cover clips text printed near its corners. -->
+    <Border>
       <Border.Background>
         <ImageBrush ImageSource="{Binding Artwork, ElementName=Badge}" Stretch="UniformToFill" />
       </Border.Background>
