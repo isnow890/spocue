@@ -9,8 +9,11 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.microsoft.com/detail/9N85N2516FLS"><img src="https://get.microsoft.com/images/ko%20dark.svg" height="44" alt="Microsoft Store에서 SpoCue 받기" /></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/isnow890/spocue/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/isnow890/spocue/build.yml?label=build&style=flat-square" alt="CI Build" /></a>
-  <a href="https://apps.microsoft.com/detail/9N85N2516FLS"><img src="https://img.shields.io/badge/Microsoft%20Store-SpoCue%20%EB%B0%9B%EA%B8%B0-0078D4?style=flat-square&logo=microsoft&logoColor=white" alt="Microsoft Store에서 받기" /></a>
   <a href="https://github.com/isnow890/spocue/releases/latest"><img src="https://img.shields.io/github/v/release/isnow890/spocue?style=flat-square" alt="Latest Release" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20(x64)-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Windows 10 / 11" />
   <img src="https://img.shields.io/badge/.NET-10%20WPF-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 10 WPF" />
