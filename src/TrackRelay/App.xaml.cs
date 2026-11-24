@@ -15,6 +15,11 @@ namespace TrackRelay;
 
 public partial class App : Application
 {
+#if STORE_BUILD
+    internal static bool StoreBuild => true;
+#else
+    internal static bool StoreBuild => false;
+#endif
     private Mutex? _instance;
     private bool _ownsInstance;
     private SpotifySession? _spotify;
@@ -54,7 +59,7 @@ public partial class App : Application
         string? optionNotice = null;
         try
         {
-            _startWithWindows = StartupRegistration.IsEnabled();
+            _startWithWindows = !StoreBuild && StartupRegistration.IsEnabled();
         }
         catch (Exception exception) when (exception is Win32Exception or IOException or UnauthorizedAccessException or SecurityException)
         {
@@ -91,9 +96,12 @@ public partial class App : Application
             }
         };
 
-        _updater = new UpdateChecker();
-        _updater.UpdateAvailable += OnUpdateAvailable;
-        _updater.SetEnabled(_preferences.CheckUpdates);
+        if (!StoreBuild)
+        {
+            _updater = new UpdateChecker();
+            _updater.UpdateAvailable += OnUpdateAvailable;
+            _updater.SetEnabled(_preferences.CheckUpdates);
+        }
 
         _spotify.Start();
         if (e.Args.Contains("--settings", StringComparer.OrdinalIgnoreCase) ||
@@ -123,7 +131,10 @@ public partial class App : Application
         {
             var error = _hotkeys!.Apply(preferences, () =>
             {
-                StartupRegistration.Save(startWithWindows, preferences.Save);
+                if (StoreBuild)
+                    preferences.Save();
+                else
+                    StartupRegistration.Save(startWithWindows, preferences.Save);
             });
             if (error is null)
             {
@@ -288,7 +299,8 @@ public partial class App : Application
         var updateLabel = _updater?.LatestUpdate is { } update
             ? Strings.Format("UpdateAvailableMenu", update.Version)
             : Strings.Get("CheckUpdatesMenu");
-        menu.Items.Add(updateLabel, null, (_, _) => CheckForUpdatesManual());
+        if (!StoreBuild)
+            menu.Items.Add(updateLabel, null, (_, _) => CheckForUpdatesManual());
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(Strings.Get("ExitMenu"), null, (_, _) => ExitApplication());
         return menu;

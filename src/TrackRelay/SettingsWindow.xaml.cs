@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,6 +26,12 @@ internal sealed partial class SettingsWindow : Window
         TrackChanges.IsChecked = preferences.ShowTrackChanges;
         StartWithWindows.IsChecked = startWithWindows;
         CheckUpdatesEnabled.IsChecked = preferences.CheckUpdates;
+        if (App.StoreBuild)
+        {
+            StartWithWindows.Visibility = Visibility.Collapsed;
+            CheckUpdatesEnabled.Visibility = Visibility.Collapsed;
+            StoreStartupSettings.Visibility = Visibility.Visible;
+        }
         Closing += (_, e) =>
         {
             if (!_app.IsExiting)
@@ -81,6 +88,12 @@ internal sealed partial class SettingsWindow : Window
     }
 
     private void PreviewClick(object sender, RoutedEventArgs e) => _app.ShowPreview();
+
+    private async void OpenStartupSettings(object sender, RoutedEventArgs e)
+    {
+        if (!await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:startupapps")))
+            SetFeedback(Strings.Get("LoadOptionsError"), true);
+    }
 
     private void ApplyClick(object sender, RoutedEventArgs e)
     {

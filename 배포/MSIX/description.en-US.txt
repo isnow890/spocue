@@ -1,0 +1,9 @@
+﻿A Windows tray app that controls Spotify with hotkeys, whatever window you're working in. Requires the Spotify desktop app.
+
+• Play/pause, next and previous track with hotkeys
+• Change Spotify's volume without touching other apps
+• Track toasts with title, artist and album art in the screen corner you choose
+• Copy the current track to the clipboard
+• Change hotkeys, toast position and language (English/Korean) in Settings
+
+No sign-in or API key needed. Free and open source. Independent project, not affiliated with or endorsed by Spotify AB.

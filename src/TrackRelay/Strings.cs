@@ -24,6 +24,7 @@ internal static class Strings
         ("PreferencesHeading", "Preferences", "환경설정"),
         ("NotifyOnChange", "Show a toast when the track changes", "곡이 바뀌면 알림 표시"),
         ("StartWithWindows", "Start with Windows", "Windows 시작 시 실행"),
+        ("StartupSettings", "Open Windows startup settings", "Windows 시작 앱 설정 열기"),
         ("CheckUpdatesLabel", "Check for updates automatically", "자동으로 업데이트 확인"),
         ("ToastPositionLabel", "Toast position", "알림 표시 위치"),
         ("CornerBottomRight", "Bottom right", "우측 하단"),

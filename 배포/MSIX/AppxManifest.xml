@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap7="http://schemas.microsoft.com/appx/manifest/uap/windows10/7" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap uap7 desktop rescap">
+  <Identity Name="isnow890.SpoCue" Publisher="CN=66813C78-4E64-4EB6-8F8C-8B505DA68923" Version="0.5.1.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>SpoCue</DisplayName>
+    <PublisherDisplayName>isnow890</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="ko-KR" />
+  </Resources>
+  <Applications>
+    <Application Id="SpoCue" Executable="SpoCue.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="SpoCue" Description="Spotify desktop playback controls and track notifications." BackgroundColor="transparent" Square150x150Logo="Assets\Tile.png" Square44x44Logo="Assets\App.png" />
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="SpoCue.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="SpoCueStartup" Enabled="false" DisplayName="SpoCue" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <uap7:Capability Name="globalMediaControl" />
+  </Capabilities>
+</Package>

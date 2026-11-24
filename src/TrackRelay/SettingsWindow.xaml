@@ -73,6 +73,8 @@
                       Foreground="{DynamicResource InkBrush}" />
             <CheckBox x:Name="StartWithWindows" Content="{DynamicResource StartWithWindows}" MinHeight="30"
                       Foreground="{DynamicResource InkBrush}" />
+            <Button x:Name="StoreStartupSettings" Content="{DynamicResource StartupSettings}" Visibility="Collapsed"
+                    HorizontalAlignment="Left" Click="OpenStartupSettings" />
             <CheckBox x:Name="CheckUpdatesEnabled" Content="{DynamicResource CheckUpdatesLabel}" MinHeight="30"
                       Foreground="{DynamicResource InkBrush}" />
             <Grid Margin="0,11,0,0">

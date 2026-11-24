@@ -8,6 +8,7 @@
     <AssemblyName>SpoCue</AssemblyName>
     <ApplicationIcon>Assets/SpoCue.ico</ApplicationIcon>
     <Version>0.5.1</Version>
+    <DefineConstants Condition="'$(StoreBuild)' == 'true'">$(DefineConstants);STORE_BUILD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets/SpoCue.ico" />
